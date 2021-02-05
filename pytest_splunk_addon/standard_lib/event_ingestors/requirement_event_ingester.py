@@ -114,3 +114,10 @@ class RequirementEventIngestor(object):
                                         }
                             events.append(SampleEvent(unescaped_event, metadata, "requirement_test"))
                         return events
+
+#todo escape before ingestion
+        # def escape_before_ingest(self, event):
+        # escape_splunk_chars = ["\""]
+        # for character in escape_splunk_chars:
+        #     event = event.replace(character, '\\' + character)
+        # return event
