@@ -350,7 +350,7 @@ def ignore_internal_errors(request):
 
 
 @pytest.fixture(scope="session")
-def splunk(request, file_system_prerequisite):
+def splunk(request):
     """
     This fixture based on the passed option will provide a real fixture
     for external or docker Splunk
@@ -652,6 +652,7 @@ def splunk_ingest_data(request, splunk_hec_uri, sc4s, uf, splunk_events_cleanup)
         "PYTEST_XDIST_WORKER" not in os.environ
         or os.environ.get("PYTEST_XDIST_WORKER") == "gw0"
     ):
+        file_system_prerequisite()
         addon_path = request.config.getoption("splunk_app")
         config_path = request.config.getoption("splunk_data_generator")
 
@@ -698,7 +699,6 @@ def splunk_events_cleanup(request, splunk_search_util):
     else:
         LOGGER.info("Events cleanup was disabled.")
 
-@pytest.fixture(scope="session")
 def file_system_prerequisite():
     """
     File system prerequisite before running tests.

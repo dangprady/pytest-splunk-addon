@@ -109,7 +109,7 @@ class FileMonitorEventIngestor(EventIngestor):
         try:
             response = requests.post(self.inputs_endpoint, stanza, auth=(self.uf_username, self.uf_password), verify=False)
             if response.status_code not in (200, 201):
-                LOGGER.warning("Unable to add stanza in inputs.conf\nStatus code: {} \nReason: {} \ntext:{}".format(response.status_code, response.reason, response.text))
+                LOGGER.warning("Unable to add stanza in inputs.conf for Path : {} \nStatus code: {} \nReason: {} \ntext:{}".format(file_path, response.status_code, response.reason, response.text))
         except ConnectionError as e:
             LOGGER.error("Unable to connect to Universal forwarder, {}".format(e))
 
