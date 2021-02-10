@@ -350,7 +350,7 @@ def ignore_internal_errors(request):
 
 
 @pytest.fixture(scope="session")
-def splunk(request):
+def splunk(request, file_system_prerequisite):
     """
     This fixture based on the passed option will provide a real fixture
     for external or docker Splunk
@@ -440,7 +440,6 @@ def uf_docker(docker_services, tmp_path_factory, worker_id, request):
         root_tmp_dir = tmp_path_factory.getbasetemp().parent
         fn = root_tmp_dir / "pytest_docker"
         with FileLock(str(fn) + ".lock"):
-            file_system_prerequisite()
             docker_services.start("uf")
     uf_info = {
         "uf_host": docker_services.docker_ip,
@@ -699,6 +698,7 @@ def splunk_events_cleanup(request, splunk_search_util):
     else:
         LOGGER.info("Events cleanup was disabled.")
 
+@pytest.fixture(scope="session")
 def file_system_prerequisite():
     """
     File system prerequisite before running tests.
@@ -706,9 +706,13 @@ def file_system_prerequisite():
     """
     UF_FILE_MONTOR_DIR = "uf_files"
     monitor_dir = os.path.join(os.getcwd(), UF_FILE_MONTOR_DIR)
-    if os.path.exists(monitor_dir):
-        shutil.rmtree(monitor_dir, ignore_errors=True)
-    os.mkdir(monitor_dir)
+    if (
+        "PYTEST_XDIST_WORKER" not in os.environ
+        or os.environ.get("PYTEST_XDIST_WORKER") == "gw0"
+    ):
+        if os.path.exists(monitor_dir):
+            shutil.rmtree(monitor_dir, ignore_errors=True)
+        os.mkdir(monitor_dir)
 
 def is_responsive_uf(uf):
     """
