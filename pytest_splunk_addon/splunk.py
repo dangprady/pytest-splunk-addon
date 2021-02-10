@@ -440,6 +440,7 @@ def uf_docker(docker_services, tmp_path_factory, worker_id, request):
         root_tmp_dir = tmp_path_factory.getbasetemp().parent
         fn = root_tmp_dir / "pytest_docker"
         with FileLock(str(fn) + ".lock"):
+            file_system_prerequisite()
             docker_services.start("uf")
     uf_info = {
         "uf_host": docker_services.docker_ip,
@@ -652,7 +653,6 @@ def splunk_ingest_data(request, splunk_hec_uri, sc4s, uf, splunk_events_cleanup)
         "PYTEST_XDIST_WORKER" not in os.environ
         or os.environ.get("PYTEST_XDIST_WORKER") == "gw0"
     ):
-        file_system_prerequisite()
         addon_path = request.config.getoption("splunk_app")
         config_path = request.config.getoption("splunk_data_generator")
 
