@@ -55,10 +55,8 @@ class ReqsTestTemplates(object):
             self.logger.info("Issue finding sourcetype")
             assert result
 
-        indextime = int(time.time())
-
         # Search for getting both data model and field extractions
-        search = f"| datamodel {model}  search | search source=pytest sourcetype={sourcetype} {escaped_event} |search  _indextime>={indextime}"
+        search = f"| datamodel {model}  search | search source=	pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event}"
         datamodel_check = splunk_search_util.checkQueryCountIsGreaterThanZero(
             search, interval=INTERVAL, retries=RETRIES
         )

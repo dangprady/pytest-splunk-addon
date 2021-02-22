@@ -107,17 +107,17 @@ class RequirementEventIngestor(object):
                         root = self.get_root(filename)
                         for event_tag in root.iter('event'):
                             unescaped_event = self.extract_raw_events(event_tag)
+                            escaped_ingest = self.escape_before_ingest(unescaped_event)
                             sourcetype = self.extract_sourcetype(src_regex, unescaped_event)
                             metadata = {'input_type': 'default',
                                         'sourcetype': sourcetype,
                                         'index': 'main'
                                         }
-                            events.append(SampleEvent(unescaped_event, metadata, "requirement_test"))
+                            events.append(SampleEvent(escaped_ingest, metadata, "requirement_test"))
                         return events
 
-#todo escape before ingestion
-        # def escape_before_ingest(self, event):
-        # escape_splunk_chars = ["\""]
-        # for character in escape_splunk_chars:
-        #     event = event.replace(character, '\\' + character)
-        # return event
+    def escape_before_ingest(self, event):
+        escape_splunk_chars = ["\""]
+        for character in escape_splunk_chars:
+            event = event.replace(character, '\\' + character)
+        return event
