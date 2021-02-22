@@ -77,10 +77,6 @@ class AppTestGenerator(object):
             yield from self.dedup_tests(
                 self.cim_test_generator.generate_tests(fixture), fixture
             )
-        elif fixture.startswith("splunk_searchtime_requirement"):
-            yield from self.dedup_tests(
-                self.requirement_test_generator.generate_tests(fixture),
-                fixture)
         elif fixture.startswith("splunk_indextime"):
             # TODO: What should be the id of the test case?
             # Sourcetype + Host + Key field + _count
@@ -124,6 +120,11 @@ class AppTestGenerator(object):
 
             elif pytest_params:
                 yield from sorted(pytest_params, key=lambda param: param.id)
+
+        elif fixture.startswith("splunk_searchtime_requirement"):
+            yield from self.dedup_tests(
+                self.requirement_test_generator.generate_tests(fixture),
+                fixture)
 
     def dedup_tests(self, test_list, fixture):
         """
