@@ -2,6 +2,11 @@
 """
 Define the TA_fiction add-on passed test case list.
 """
+TA_REQUIREMENTS_PASSED = [
+    '*test_splunk_app_requirements.py::Test_App::test_events_with_untokenised_values PASSED*',
+    '*test_splunk_app_requirements.py::Test_App::test_cim_params* PASSED*',
+]
+
 TA_FICTION_PASSED = [
     '*test_splunk_app_fiction.py::Test_App::test_events_with_untokenised_values PASSED*',
     '*test_splunk_app_fiction.py::Test_App::test_splunk_internal_errors PASSED*',

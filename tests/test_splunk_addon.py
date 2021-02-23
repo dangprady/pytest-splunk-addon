@@ -154,6 +154,48 @@ def test_splunk_app_fiction(testdir):
 
 
 @pytest.mark.docker
+def test_splunk_app_requirements(testdir):
+    """Make sure that pytest accepts our fixture."""
+
+    testdir.makepyfile(
+        """
+        from pytest_splunk_addon.standard_lib.addon_basic import Basic
+        class Test_App(Basic):
+            def empty_method():
+                pass
+
+    """
+    )
+
+    shutil.copytree(
+        os.path.join(testdir.request.fspath.dirname, "addons/TA_requirement_test"),
+        os.path.join(testdir.tmpdir, "package"),
+    )
+
+    setup_test_dir(testdir)
+    SampleGenerator.clean_samples()
+    Rule.clean_rules()
+
+    # run pytest with the following cmd args
+    result = testdir.runpytest(
+        "--splunk-type=docker",
+        "-v",
+        "-m splunk_searchtime_requirements",
+        "--search-interval=4",
+        "--search-retry=4",
+        "--search-index=*,_internal",
+        "--requirement-test",
+    )
+    logger.info(result.outlines)
+    logger.info(len(constants.TA_REQUIREMENTS_PASSED))
+    result.stdout.fnmatch_lines_random(constants.TA_REQUIREMENTS_PASSED)
+    result.assert_outcomes(passed=len(constants.TA_REQUIREMENTS_PASSED), failed=0)
+
+    # make sure that that we get a '0' exit code for the testsuite
+    assert result.ret == 0
+
+
+@pytest.mark.docker
 def test_splunk_app_broken(testdir):
     """Make sure that pytest accepts our fixture."""
 
