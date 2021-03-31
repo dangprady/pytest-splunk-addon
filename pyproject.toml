@@ -45,7 +45,7 @@ requests-mock = "^1.8.0"
 recordtype = "^1.3"
 
 [tool.poetry.plugins]
-pytest11 = { plugin = "pytest_splunk_addon.plugin", "splunk" = "pytest_splunk_addon.splunk" }
+pytest11 = { plugin = "pytest_splunk_addon.plugin", splunk = "pytest_splunk_addon.splunk" }
 
 [tool.poetry.scripts]
 cim-report = 'pytest_splunk_addon.standard_lib.utilities.junit_parser:main'
