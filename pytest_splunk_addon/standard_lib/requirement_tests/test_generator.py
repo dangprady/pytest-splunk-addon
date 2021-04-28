@@ -184,7 +184,7 @@ class ReqsTestGenerator(object):
         """
         escape_splunk_chars = ["\\", "`", "~", "!", "@", "#", "$", "%",
                                "^", "&", "*", "(", ")", "-", "=", "+", "[", "]", "}", "{", "|",
-                               ";", ":", "'", "\"", "\,", "<", ">", "\/", "?"]
+                               ";", ":", "'", "\,", "<", ">", "\/", "?"]
         for character in escape_splunk_chars:
             event = event.replace(character, '\\' + character)
         return event

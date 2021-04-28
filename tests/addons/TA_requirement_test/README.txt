@@ -1,4 +1,4 @@
-Splunk Add-on for Juniper
-Copyright (C) 2020 Splunk Inc. All Rights Reserved.
+Splunk Add-on for Infoblox
+Copyright (C) 2021 Splunk Inc. All Rights Reserved.
 
-For documentation, see: http://docs.splunk.com/Documentation/AddOns/latest/Juniper
+For documentation, see: https://docs.splunk.com/Documentation/AddOns/released/Infoblox/About

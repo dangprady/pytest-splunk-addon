@@ -44,7 +44,7 @@ class ReqsTestTemplates(object):
         filename = splunk_searchtime_requirement_param["filename"]
         sourcetype = splunk_searchtime_requirement_param["sourcetype"]
         key_values_xml = splunk_searchtime_requirement_param["Key_value_dict"]
-        self.logger.info(key_values_xml)
+        #self.logger.info(key_values_xml)
         result = False
         if model is None and escaped_event is None:
             self.logger.info("Issue parsing log file {}".format(filename))
@@ -55,20 +55,23 @@ class ReqsTestTemplates(object):
         if sourcetype is None:
             self.logger.info("Issue finding sourcetype")
             assert result
+        search = f" search source= pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event} |fields * "
 
         # Search for getting both data model and field extractions
-        search = f"| datamodel {model} {dataset}  search | search source=	pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event}"
-        datamodel_check = splunk_search_util.checkQueryCountIsGreaterThanZero(
+        #search = f"| datamodel {model} {dataset}  search | search source=	pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event}"
+        ingestion_check = splunk_search_util.checkQueryCountIsGreaterThanZero(
             search, interval=INTERVAL, retries=RETRIES
         )
-        assert datamodel_check, (
-            f"Data model mismatch \nsearch={search}\n"
+        assert ingestion_check, (
+            f"ingestion failure \nsearch={search}\n"
         )
-        self.logger.info(f"Data model mapping check: {datamodel_check}")
+        self.logger.info(f"ingestion_check: {ingestion_check}")
 
         keyValue_dict_SPL = splunk_search_util.getFieldValuesDict(
             search, interval=INTERVAL, retries=RETRIES
         )
+        self.logger.info(f"SPL dict: {keyValue_dict_SPL}")
+        self.logger.info(f"key_values_xml:{key_values_xml}")
         field_extraction_check = self.compare(keyValue_dict_SPL, key_values_xml)
         self.logger.info(f"Field mapping check: {field_extraction_check}")
 

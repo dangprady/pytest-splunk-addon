@@ -1,57 +1,59 @@
 {
-  "dependencies": null,
-  "incompatibleApps": null,
+  "schemaVersion": "2.0.0",
   "info": {
+    "title": "Splunk Add-on for Infoblox",
+    "id": {
+      "group": null,
+      "name": "Splunk_TA_infoblox",
+      "version": "2.0.1"
+    },
     "author": [
       {
         "name": "Splunk, Inc.",
-        "email": null,
-        "company": null
+        "email": "support@splunk.com",
+        "company": "Splunk, Inc."
       }
     ],
+    "releaseDate": null,
+    "description": "Splunk Add-on for Infoblox",
     "classification": {
+      "intendedAudience": "IT",
       "categories": [
         "IT Operations",
         "Security, Fraud & Compliance"
-      ],
-      "developmentStatus": "Production/Stable",
-      "intendedAudience": "IT Professionals"
+        ],
+      "developmentStatus": "Production/Stable"
     },
-    "commonInformationModels": {
-      "Alerts": "==4.18.0",
-      "Authentication": "==4.18.0",
-      "Change": "==4.18.0",
-      "Intrusion Detection": "==4.18.0",
-      "Network Traffic": "==4.18.0",
-      "Web": "==4.18.0"
-    },
-    "description": "Splunk Add-on for Juniper",
-    "id": {
-      "group": null,
-      "name": "Splunk_TA_juniper",
-      "version": "1.5.5-rfb1b492"
+    "commonInformationModels":{
+        "Network Resolution (DNS)": "=4.17.0",
+        "Change": "=4.17.0",
+        "Network Sessions (DHCP)": "=4.17.0",
+        "Network Sessions (Session Start)": "=4.17.0",
+        "Network Sessions (Session End)": "=4.17.0",
+        "Intrusion Detection": "=4.17.0",
+        "Authentication": "=4.17.0"
     },
     "license": {
-      "name": null,
+      "name": "Splunk Software License Agreement",
       "text": "LICENSES/LicenseRef-Splunk-1-2020.txt",
-      "uri": null
+      "uri": "http://www.splunk.com/view/SP-CAAAAFA"
     },
     "privacyPolicy": {
       "name": null,
       "text": null,
       "uri": null
     },
-    "releaseDate": null,
     "releaseNotes": {
       "name": "README",
-      "text": "README.txt",
-      "uri": "https://docs.splunk.com/Documentation/AddOns/released/Juniper/Releasenotes"
-    },
-    "title": "Splunk Add-on for Juniper"
+      "text": "./README.txt",
+      "uri": "https://docs.splunk.com/Documentation/AddOns/released/Infoblox/Releasenotes"
+    }
   },
+  "dependencies": null,
+  "tasks": null,
   "inputGroups": null,
+  "incompatibleApps": null,
   "platformRequirements": null,
-  "schemaVersion": "2.0.0",
   "supportedDeployments": [
     "_standalone",
     "_distributed",
@@ -61,6 +63,5 @@
     "_search_heads",
     "_indexers",
     "_forwarders"
-  ],
-  "tasks": null
+  ]
 }

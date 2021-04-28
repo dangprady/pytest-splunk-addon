@@ -1,0 +1,41 @@
+ <event code="" name="infoblox audit logs" format="">
+      <version>8.4.4</version>
+      <transport type="file monitor, syslog"/>
+      <source>
+         <comment>This event is collected from live lab setup on Cloudshare. Configuration is "DETAILED". Docs link: https://docs.infoblox.com/display/nios84/Monitoring+Tools</comment>
+      </source>
+      <raw>
+          <![CDATA[<29>Sep 14 11:20:36 nandini2 httpd: 2020-09-14 11:20:36.421Z [admin]: Created AdminMember22 admin2: Set extensible_attributes=[],auth_type="LOCAL",ca_certificate_issuer=NULL,comment="",disabled=False,email="",groups=[AdminGroup:.admin-group],name="admin2",password="******"]]>
+      </raw>
+      <cim>
+         <models>
+            <model>Change:Account_Management</model>
+         </models>
+         <cim_fields>
+            <field name="action" value="created" />
+            <field name="change_type" value="AAA" />
+            <field name="command" value="Web"/>
+            <field name="dest" value="192.168.1.2" />
+            <field name="dest_ip" value="192.168.1.2" />
+            <field name="dvc" value="192.168.1.2"/>
+            <field name="object" value="admin2" />
+            <field name="object_attrs" value="AdminMember" />
+            <field name="object_category" value="user" />
+            <field name="src_user" value="admin" />
+            <field name="status" value="success" />
+            <field name="user" value="admin2" />
+            <field name="user_type" value="admin" />
+            <field name="vendor_product" value="Infoblox NIOS" />
+         </cim_fields>
+         <missing_recommended_fields>
+            <field>object_id</field>
+            <field>object_path</field>
+            <field>result</field>
+            <field>result_id</field>
+            <field>dest_nt_domain</field>
+            <field>src_nt_domain</field>
+            <field>src</field>
+         </missing_recommended_fields>
+      </cim>
+      <test></test>
+   </event>
