@@ -1,6 +1,7 @@
 import logging
 import pytest
 import time
+import ast
 
 INTERVAL = 3
 RETRIES = 3
@@ -36,6 +37,68 @@ class ReqsTestTemplates(object):
                 flag = False
         return flag
 
+    def extract_tag(self, keyValueSPL):
+        for key, value in keyValueSPL.items():
+            if key == "tag":
+                # Converting string to list
+                self.logger.info(value)
+                list_of_extracted_tags = value.strip('][').split(',')
+                self.logger.info(list_of_extracted_tags)
+                return list_of_extracted_tags
+
+    def get_associated_tags(selfself, datamodel):
+        dict_datamodel_tag = {
+            "Alerts": {
+                "mandatory": "alert"
+            },
+            "Authentication":
+            {
+                "mandatory": "authentication",
+                "Default_Authentication": "default",
+                "Insecure_Authentication": ["cleartext", "insecure"],
+                "Privileged_Authentication": ["privileged"]
+            },
+            # "Application_State": ["listening", "port", "process", "report", "service"],
+            # "Certificates": ["certificate", "ssl", "tls"],
+            # "Change": ["change", "audit", "endpoint", "network", "account", "instance"],
+            # "Change_Analysis": ["change", "audit", "endpoint", "network", "account"],
+            # "Databases": ["database", "instance", "stats", "session", "lock", "query", "tablespace", "stats"],
+            # "DLP": ["dlp", "incident"],
+            # "Email": ["email", "delivery", "content", "filter"],
+            # "Endpoint": ["listening", "port", "process", "report", "service", "report", "endpoint", "filesystem", "registry"],
+            # "Event_Signatures": ["track_event_signatures"],
+            # "Interprocess_Messaging": ["messaging"],
+            # "Intrusion_Detection": ["ids", "attack"],
+            # "Inventory": ["inventory", "cpu", "memory", "network", "storage", "system", "version", "user", "virtual"],
+            # "JVM": ["jvm", "threading", "runtime", "os", "compilation", "classloading", "memory"],
+            # "Malware": ["malware", "attack", "malware", "operations"],
+            "Network_Resolution":
+            { "mandatory": ["network", "resolution", "dns"]
+            }
+            # "Network_Sessions": ["network", "session"],
+            # "Network_Traffic": ["network", "communicate"],
+            # "Performance": ["performance", "cpu", "facilities", "memory", "storage", "network", "os", "uptime", "time","synchronize"],
+            # "Splunk_Audit": ["modaction", "invocation"],
+            # "Ticket_Management": ["ticketing", "change", "incident", "problem"],
+            # "Updates": ["update", "status", "error"],
+            # "Vulnerabilities": ["report", "vulnerability"],
+            # "Web": ["web", "proxy"]
+        }
+        for key in dict_datamodel_tag:
+            if key == datamodel:
+                return dict_datamodel_tag[key]
+        return None
+
+    def check_mandatory_tag(self, tags_search, associated_tags ):
+        mandatory_associated = associated_tags["mandatory"]
+        self.logger.info(type(mandatory_associated))
+        self.logger.info(type(tags_search))
+        self.logger.info(mandatory_associated)
+        self.logger.info(tags_search)
+        check = all(elem in tags_search  for elem in mandatory_associated)
+        self.logger.info(check)
+        return check
+
     @pytest.mark.splunk_searchtime_requirements
     def test_requirement_params(self, splunk_searchtime_requirement_param, splunk_search_util):
         model = splunk_searchtime_requirement_param["model"]
@@ -70,8 +133,17 @@ class ReqsTestTemplates(object):
         keyValue_dict_SPL = splunk_search_util.getFieldValuesDict(
             search, interval=INTERVAL, retries=RETRIES
         )
+        self.logger.info(type(keyValue_dict_SPL))
+        extracted_tags = self.extract_tag(keyValue_dict_SPL)
+        self.logger.info(extracted_tags)
+        tags_based_on_datamodel = self.get_associated_tags(model)
+        self.logger.info(tags_based_on_datamodel)
+
+        mandatory_fullfilled = self.check_mandatory_tag(extracted_tags,tags_based_on_datamodel)
+        self.logger.info(f"Mandatory Fulfilled : {mandatory_fullfilled}")
         self.logger.info(f"SPL dict: {keyValue_dict_SPL}")
         self.logger.info(f"key_values_xml:{key_values_xml}")
+
         field_extraction_check = self.compare(keyValue_dict_SPL, key_values_xml)
         self.logger.info(f"Field mapping check: {field_extraction_check}")
 
