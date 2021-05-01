@@ -42,9 +42,13 @@ class ReqsTestTemplates(object):
             if key == "tag":
                 # Converting string to list
                 self.logger.info(value)
-                list_of_extracted_tags = value.strip('][').split(',')
+                list_of_extracted_tags = value.strip('][').split(', ')
+                c=[]
+                for item in list_of_extracted_tags:
+                    item= item.replace("'", "")
+                    c.append(item)
                 self.logger.info(list_of_extracted_tags)
-                return list_of_extracted_tags
+                return c
 
     def get_associated_tags(selfself, datamodel):
         dict_datamodel_tag = {
