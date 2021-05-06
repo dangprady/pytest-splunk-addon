@@ -12,8 +12,87 @@ class ReqsTestTemplates(object):
     Test templates to test the log files in the event_analytics folder
     """
     logger = logging.getLogger()
+    dict_datamodel_tag = {
+            'Alerts': ['alert'],
+            'Authentication': ['authentication'],
+            'Authentication_Default_Authentication': ['default', 'authentication'],
+            'Authentication_Insecure_Authentication': ['authentication', 'insecure'],
+            'Authentication_Insecure_Authentication.2': ['authentication', 'cleartext'],
+            'Authentication_PrivilegedAuthentication': ['authentication', 'privileged'],
+            'Certificates': ['certificate'],
+            'Certificates_SSL': ['certificate', 'ssl'],
+            'Change': ['change'],
+            'Change_Auditing_Changes': ['change', 'audit'],
+            'Change_Endpoint_Changes': ['change', 'endpoint'],
+            'Change_Network_Changes': ['change', 'network'],
+            'Change_Account_Management': ['change', 'account'],
+            'Change_Instance_Changes': ['change', 'instance'],
+            'Compute_Inventory_CPU': ['inventory', 'cpu'],
+            'Compute_Inventory_Memory': ['inventory', 'memory'],
+            'Compute_Inventory_Network': ['inventory', 'network'],
+            'Compute_Inventory_Storage': ['inventory', 'storage'],
+            'Compute_Inventory_OS': ['inventory', 'system', 'version'],
+            'Compute_Inventory_User': ['inventory', 'user'],
+            'Compute_Inventory_User_Default_Accounts': ['inventory', 'user', 'default'],
+            'Compute_Inventory_Virtual_OS': ['inventory', 'virtual'],
+            'Compute_Inventory_Virtual_OS_Snapshot': ['inventory', 'virtual', 'snapshot'],
+            'Compute_Inventory_Virtual_OS_Tools': ['inventory', 'virtual', 'tools'], 'Databases': ['database'],
+            'Databases_Database_Instance': ['database', 'instance'],
+            'Databases_Database_Instance_Instance_Stats': ['database', 'instance', 'stats'],
+            'Databases_Database_Instance_Session_Info': ['database', 'instance', 'session'],
+            'Databases_Database_Instance_Lock_Info': ['database', 'instance', 'lock'],
+            'Databases_Database_Query': ['database', 'query'],
+            'Databases_Database_Query_tablespace': ['database', 'query', 'tablespace'],
+            'Databases_Database_Query_Query_Stats': ['database', 'query', 'stats'], 'DLP': ['dlp', 'incident'],
+            'Email': ['email'],
+            'Email_Delivery': ['email', 'delivery'],
+            'Email_Content': ['email', 'content'],
+            'Email_Filtering': ['email', 'filter'],
+            'Endpoint_ports': ['listening', 'port'],
+            'Endpoint_Processes': ['process', 'report'],
+            'Endpoint_Filesystem': ['endpoint', 'filesystem'],
+            'Endpoint_Services': ['service', 'report'],
+            'Endpoint_Registry': ['endpoint', 'registry'],
+            'Event_Signatures_Signatures': ['track_event_signatures'],
+            'Interprocess_Messaging': ['messaging'],
+            'Intrusion_Detection': ['ids', 'attack'],
+            'JVM': ['jvm'], 'JVM_Runtime': ['jvm', 'runtime'],
+            'JVM_OS': ['jvm', 'os'],
+            'JVM_Classloading': ['jvm', 'classloading'],
+            'JVM_Memory': ['jvm', 'memory'],
+            'JVM_Threading': ['jvm', 'threading'],
+            'JVM_Compilation': ['jvm', 'compilation'],
+            'Malware_Malware_Attacks': ['malware', 'attack'],
+            'Malware_Malware_Operations': ['malware', 'operations'],
+            'Network_Resolution': ['network', 'resolution', 'dns'],
+            'Network_Sessions': ['network', 'session'],
+            'Network_Sessions_Session_Start': ['network', 'session', 'start'],
+            'Network_Sessions_Session_End': ['network', 'session', 'end'],
+            'Network_Sessions_DHCP': ['network', 'session', 'dhcp'],
+            'Network_Sessions_VPN': ['network', 'session', 'vpn'],
+            'Network_Traffic': ['network', 'communicate'],
+            'Performance_CPU': ['performance', 'cpu'],
+            'Performance_Facilities': ['performance', 'facilities'],
+            'Performance_Memory': ['performance', 'memory'],
+            'Performance_Storage': ['performance', 'storage'],
+            'Performance_OS': ['performance', 'os'],
+            'Performance_OS_Timesync': ['performance', 'os', 'time', 'synchronize'],
+            'Performance_OS_Uptime': ['performance', 'os', 'uptime'],
+            'Splunk_Audit': ['modaction'],
+            'Splunk_Audit_Modular_Action_Invocations': ['modaction', 'invocation'],
+            'Ticket_Management': ['ticketing'],
+            'Ticket_Management_Change': ['ticketing', 'change'],
+            'Ticket_Management_Incident': ['ticketing', 'incident'],
+            'Ticket_Management_Problem': ['ticketing', 'problem'],
+            'Updates': ['update', 'status'],
+            'Updates_Update_Errors': ['update', 'error'],
+            'Vulnerabilities': ['report', 'vulnerability'],
+            'Web': ['web'],
+            'Web_proxy': ['web', 'proxy']
+        }
 
-    # Function to remove the data model subset concatenated to fields from the dictionary
+
+     # Function to remove the data model subset concatenated to fields from the dictionary
     # eg : All_traffic.dest -> dest else do nothing
     def process_str(self, in_str):
         new_dict = {}
@@ -45,53 +124,17 @@ class ReqsTestTemplates(object):
                 list_of_extracted_tags = value.strip('][').split(', ')
                 c=[]
                 for item in list_of_extracted_tags:
-                    item= item.replace("'", "")
+                    item = item.replace("'", "")
                     c.append(item)
                 self.logger.info(list_of_extracted_tags)
                 return c
 
-    def get_associated_tags(selfself, datamodel):
-        dict_datamodel_tag = {
-            "Alerts": {
-                "mandatory": "alert"
-            },
-            "Authentication":
-            {
-                "mandatory": "authentication",
-                "Default_Authentication": "default",
-                "Insecure_Authentication": ["cleartext", "insecure"],
-                "Privileged_Authentication": ["privileged"]
-            },
-            # "Application_State": ["listening", "port", "process", "report", "service"],
-            # "Certificates": ["certificate", "ssl", "tls"],
-            # "Change": ["change", "audit", "endpoint", "network", "account", "instance"],
-            # "Change_Analysis": ["change", "audit", "endpoint", "network", "account"],
-            # "Databases": ["database", "instance", "stats", "session", "lock", "query", "tablespace", "stats"],
-            # "DLP": ["dlp", "incident"],
-            # "Email": ["email", "delivery", "content", "filter"],
-            # "Endpoint": ["listening", "port", "process", "report", "service", "report", "endpoint", "filesystem", "registry"],
-            # "Event_Signatures": ["track_event_signatures"],
-            # "Interprocess_Messaging": ["messaging"],
-            # "Intrusion_Detection": ["ids", "attack"],
-            # "Inventory": ["inventory", "cpu", "memory", "network", "storage", "system", "version", "user", "virtual"],
-            # "JVM": ["jvm", "threading", "runtime", "os", "compilation", "classloading", "memory"],
-            # "Malware": ["malware", "attack", "malware", "operations"],
-            "Network_Resolution":
-            { "mandatory": ["network", "resolution", "dns"]
-            }
-            # "Network_Sessions": ["network", "session"],
-            # "Network_Traffic": ["network", "communicate"],
-            # "Performance": ["performance", "cpu", "facilities", "memory", "storage", "network", "os", "uptime", "time","synchronize"],
-            # "Splunk_Audit": ["modaction", "invocation"],
-            # "Ticket_Management": ["ticketing", "change", "incident", "problem"],
-            # "Updates": ["update", "status", "error"],
-            # "Vulnerabilities": ["report", "vulnerability"],
-            # "Web": ["web", "proxy"]
-        }
-        for key in dict_datamodel_tag:
-            if key == datamodel:
-                return dict_datamodel_tag[key]
-        return None
+    def fetch_datamodel_by_tags(self,tag):
+        list_matching_datamodel = []
+        for datamodel, tags in self.dict_datamodel_tag.items():
+            if set(tags) <= set(tag):
+                list_matching_datamodel.append(datamodel)
+        return list_matching_datamodel
 
     def check_mandatory_tag(self, tags_search, associated_tags ):
         mandatory_associated = associated_tags["mandatory"]
@@ -137,14 +180,14 @@ class ReqsTestTemplates(object):
         keyValue_dict_SPL = splunk_search_util.getFieldValuesDict(
             search, interval=INTERVAL, retries=RETRIES
         )
-        self.logger.info(type(keyValue_dict_SPL))
+        self.logger.info(keyValue_dict_SPL)
         extracted_tags = self.extract_tag(keyValue_dict_SPL)
         self.logger.info(extracted_tags)
-        tags_based_on_datamodel = self.get_associated_tags(model)
-        self.logger.info(tags_based_on_datamodel)
+        datamodel_based_on_tag = self.fetch_datamodel_by_tags(extracted_tags)
+        self.logger.info(datamodel_based_on_tag)
 
-        mandatory_fullfilled = self.check_mandatory_tag(extracted_tags,tags_based_on_datamodel)
-        self.logger.info(f"Mandatory Fulfilled : {mandatory_fullfilled}")
+        # mandatory_fullfilled = self.check_mandatory_tag(extracted_tags,tags_based_on_datamodel)
+        # self.logger.info(f"Mandatory Fulfilled : {mandatory_fullfilled}")
         self.logger.info(f"SPL dict: {keyValue_dict_SPL}")
         self.logger.info(f"key_values_xml:{key_values_xml}")
 
