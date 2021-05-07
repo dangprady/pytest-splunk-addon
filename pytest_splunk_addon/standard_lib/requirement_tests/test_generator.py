@@ -26,6 +26,12 @@ class keyValue(dict):
         self[key] = value
 
 
+class ModelDatasetSubdataset(object):
+    def __init__(self):
+        self.model = None
+        self.dataset = None
+        self.subdataset = None
+
 class ReqsTestGenerator(object):
     """
     Generates test cases to test the events in the log files of the event anlytics folder
@@ -90,23 +96,24 @@ class ReqsTestGenerator(object):
                             # self.logger.info(key_value_dict)
                             if len(model_list) == 0:
                                 continue
+                            list_model_dataset_subdataset = []
                             for model in model_list:
                                 model = model.replace(" ", "_")
                                 # Function to extract data set
                                 model, dataset, subdataset = self.split_model(model)
+                                list_model_dataset_subdataset.append({'model': model, 'dataset':dataset, 'subdataset': subdataset})
                                 logging.info(dataset)
-                                req_test_id = req_test_id + 1
-                                yield pytest.param(
-                                    {
-                                        "model": model,
-                                        "dataset": dataset,
+                            req_test_id = req_test_id + 1
+                            yield pytest.param(
+                                {
+                                       "model_list": list_model_dataset_subdataset,
                                         "escaped_event": escaped_event,
                                         "filename": filename,
                                         "sourcetype": sourcetype,
                                         "Key_value_dict": key_value_dict,
-                                    },
-                                    id=f"{model}::{dataset}::{filename}::req_test_id::{req_test_id}",
-                                )
+                                },
+                                id=f"{model}::{dataset}::{filename}::req_test_id::{req_test_id}",
+                            )
                     except Exception:
                         req_test_id = req_test_id + 1
                         yield pytest.param(

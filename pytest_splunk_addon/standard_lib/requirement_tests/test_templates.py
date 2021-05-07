@@ -63,26 +63,28 @@ class ReqsTestTemplates(object):
         self.logger.info(type(tags_search))
         self.logger.info(mandatory_associated)
         self.logger.info(tags_search)
-        check = all(elem in tags_search  for elem in mandatory_associated)
+        check = all(elem in tags_search for elem in mandatory_associated)
         self.logger.info(check)
         return check
 
     @pytest.mark.splunk_searchtime_requirements
     def test_requirement_params(self, splunk_searchtime_requirement_param, splunk_search_util):
-        model = splunk_searchtime_requirement_param["model"]
-        dataset = splunk_searchtime_requirement_param["dataset"]
+        #model = splunk_searchtime_requirement_param["model"]
+        #dataset = splunk_searchtime_requirement_param["dataset"]
+        model_datalist = splunk_searchtime_requirement_param["model_list"]
+        self.logger.info(model_datalist[0]['model'])
         escaped_event = splunk_searchtime_requirement_param["escaped_event"]
         filename = splunk_searchtime_requirement_param["filename"]
         sourcetype = splunk_searchtime_requirement_param["sourcetype"]
         key_values_xml = splunk_searchtime_requirement_param["Key_value_dict"]
         #self.logger.info(key_values_xml)
         result = False
-        if model is None and escaped_event is None:
-            self.logger.info("Issue parsing log file {}".format(filename))
-            pytest.skip('Issue parsing log file')
-        if model is None and escaped_event is not None:
-            self.logger.info("No model present in file")
-            pytest.skip('No model present in file')
+        # if model is None and escaped_event is None:
+        #     self.logger.info("Issue parsing log file {}".format(filename))
+        #     pytest.skip('Issue parsing log file')
+        # if model is None and escaped_event is not None:
+        #     self.logger.info("No model present in file")
+        #     pytest.skip('No model present in file')
         if sourcetype is None:
             self.logger.info("Issue finding sourcetype")
             assert result
