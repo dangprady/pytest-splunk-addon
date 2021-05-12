@@ -111,8 +111,8 @@ class ReqsTestTemplates(object):
         datamodel_check = not bool(list_unmatched_datamodel_splunkside or list_unmatched_datamodel_requirement_file )
         assert datamodel_check, (
             f"datamodel check: {datamodel_check} \n"
-            f"datamodel extracted on splunk side but not in requirement file={list_unmatched_datamodel_splunkside}\n"
-            f"datamodel in requirement file but not extracted on splunk side or missing dataset.\n {list_unmatched_datamodel_requirement_file}\n"
+            f"datamodel in requirement file but not extracted on splunk side or missing dataset {list_unmatched_datamodel_splunkside}\n"
+            f"datamodel extracted on splunk side but not in requirement file.\n {list_unmatched_datamodel_requirement_file}\n"
         )
 
         field_extraction_check = self.compare(keyValue_dict_SPL, key_values_xml)
