@@ -1,7 +1,5 @@
 import logging
 import pytest
-import time
-import ast
 from .requirement_test_datamodel_tag_constants import dict_datamodel_tag
 INTERVAL = 3
 RETRIES = 3
@@ -13,7 +11,7 @@ class ReqsTestTemplates(object):
     """
     logger = logging.getLogger()
 
-     # Function to remove the data model subset concatenated to fields from the dictionary
+    # Function to remove the data model subset concatenated to fields from the dictionary
     # eg : All_traffic.dest -> dest else do nothing
     def process_str(self, in_str):
         new_dict = {}
@@ -109,10 +107,15 @@ class ReqsTestTemplates(object):
         )
         list_unmatched_datamodel_splunkside, list_unmatched_datamodel_requirement_file = self.datamodel_check_test(keyValue_dict_SPL, model_datalist)
         datamodel_check = not bool(list_unmatched_datamodel_splunkside or list_unmatched_datamodel_requirement_file )
+        self.logger.info(f"Data model check: {datamodel_check}")
+        if not list_unmatched_datamodel_requirement_file:
+            list_unmatched_datamodel_requirement_file = "None"
+        if not list_unmatched_datamodel_splunkside:
+            list_unmatched_datamodel_splunkside = "None"
         assert datamodel_check, (
             f"datamodel check: {datamodel_check} \n"
             f"datamodel in requirement file but not extracted on splunk side or missing dataset {list_unmatched_datamodel_splunkside}\n"
-            f"datamodel extracted on splunk side but not in requirement file.\n {list_unmatched_datamodel_requirement_file}\n"
+            f"datamodel extracted on splunk side but not in requirement file {list_unmatched_datamodel_requirement_file}\n"
         )
 
         field_extraction_check = self.compare(keyValue_dict_SPL, key_values_xml)
