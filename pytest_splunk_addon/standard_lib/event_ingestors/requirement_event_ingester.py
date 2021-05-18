@@ -101,7 +101,13 @@ class RequirementEventIngestor(object):
         escape_splunk_chars = ["\""]
         for character in escape_splunk_chars:
             event = event.replace(character, '\\' + character)
+            event = event.strip()
         return event
+
+    #extract  transport tag
+    def extract_transport_tag(self, event):
+        for transport in event.iter('transport'):
+            return transport.get('type')
 
     def get_events(self):
         req_file_path = os.path.join(self.app_path, "requirement_files")
@@ -115,10 +121,15 @@ class RequirementEventIngestor(object):
                     if self.check_xml_format(filename):
                         root = self.get_root(filename)
                         for event_tag in root.iter('event'):
+                            transport_type = self.extract_transport_tag(event_tag)
+                            if transport_type == "syslog":
+                                LOGGER.info("sending data using sc4s")
+                            else:
+                                transport_type = "default"
                             unescaped_event = self.extract_raw_events(event_tag)
                             sourcetype = self.extract_sourcetype(src_regex, unescaped_event)
                             escaped_ingest = self.escape_before_ingest(unescaped_event)
-                            metadata = {'input_type': 'default',
+                            metadata = {'input_type': transport_type,
                                         'sourcetype': sourcetype,
                                         'index': 'main'
                                         }
