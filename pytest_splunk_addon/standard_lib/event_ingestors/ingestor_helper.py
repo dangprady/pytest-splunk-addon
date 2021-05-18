@@ -72,5 +72,5 @@ class IngestorHelper(object):
                 LOGGER.info(event)
                 input_type = "syslog_tcp"
                 event_ingestor = cls.get_event_ingestor(input_type, ingest_meta_data)
-                event_ingestor.ingest(events, thread_count)
+                event_ingestor.ingest(event, thread_count)
                 LOGGER.info("Ingestion Done")
