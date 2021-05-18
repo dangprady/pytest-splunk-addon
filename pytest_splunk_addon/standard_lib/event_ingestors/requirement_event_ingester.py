@@ -115,6 +115,7 @@ class RequirementEventIngestor(object):
         events = []
         if os.path.isdir(req_file_path):
             for file1 in os.listdir(req_file_path):
+                LOGGER.info(file1)
                 filename = os.path.join(req_file_path, file1)
                 if filename.endswith(".log"):
                     LOGGER.info(filename)
@@ -134,4 +135,4 @@ class RequirementEventIngestor(object):
                                         'index': 'main'
                                         }
                             events.append(SampleEvent(escaped_ingest, metadata, "requirement_test"))
-                        return events
+            return events
