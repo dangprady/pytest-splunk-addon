@@ -60,6 +60,10 @@ class ReqsTestGenerator(object):
         # self.logger.info(key_value_dict)
         return key_value_dict
 
+    def extract_transport_tag(self, event):
+        for transport in event.iter('transport'):
+            return transport.get('type')
+
     def generate_cim_req_params(self):
         """
         Generate & Yield pytest.param for each test case.
@@ -82,9 +86,12 @@ class ReqsTestGenerator(object):
                         sourcetype = None
                         abc = self.check_xml_format(filename)
                         root = self.get_root(filename)
+
                         for event_tag in root.iter('event'):
                             unescaped_event = self.get_event(event_tag)
-                            sourcetype = self.extractSourcetype(src_regex, unescaped_event)
+                            transport_type = self.extract_transport_tag(event_tag)
+                            self.logger.info(transport_type)
+                            #sourcetype = self.extractSourcetype(src_regex, unescaped_event)
                             escaped_event = self.escape_char_event(unescaped_event)
                             model_list = self.get_models(event_tag)
                             # Fetching kay value pair from XML

@@ -96,10 +96,11 @@ class ReqsTestTemplates(object):
         sourcetype = splunk_searchtime_requirement_param["sourcetype"]
         key_values_xml = splunk_searchtime_requirement_param["Key_value_dict"]
         result = False
-        if sourcetype is None:
-            self.logger.info("Issue finding sourcetype")
-            assert result
-        search = f" search source= pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event} |fields * "
+        # if sourcetype is None:
+        #     self.logger.info("Issue finding sourcetype")
+        #     assert result
+        #search = f" search source= pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event} |fields * "
+        search = f" search source=sc4s  {escaped_event} |fields * "
         ingestion_check = splunk_search_util.checkQueryCountIsGreaterThanZero(
             search, interval=INTERVAL, retries=RETRIES
         )

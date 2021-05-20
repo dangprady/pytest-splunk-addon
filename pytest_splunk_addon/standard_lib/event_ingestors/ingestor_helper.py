@@ -68,9 +68,7 @@ class IngestorHelper(object):
         if run_requirement_test:
             requirement_event = RequirementEventIngestor(addon_path)
             events = requirement_event.get_events()
-            for event in events:
-                LOGGER.info(event)
-                input_type = "syslog_tcp"
-                event_ingestor = cls.get_event_ingestor(input_type, ingest_meta_data)
-                event_ingestor.ingest(event, thread_count)
-                LOGGER.info("Ingestion Done")
+            input_type = "syslog_tcp"
+            event_ingestor = cls.get_event_ingestor(input_type, ingest_meta_data)
+            event_ingestor.ingest(events, thread_count)
+            LOGGER.info("Ingestion Done")
