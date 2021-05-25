@@ -66,15 +66,22 @@ class ReqsTestGenerator(object):
 
     def strip_syslog_header(self, raw_event):
         raw_event = raw_event.strip()
-        result = re.search(
+        CEF_format_match = re.search(r"\s(CEF:\d\|[^\|]+\|([^\|]+)\|[^\|]+\|[^\|]+\|[^\|]+\|([^\|]+)\|(.*))", raw_event)
+        if CEF_format_match:
+            stripped_header = CEF_format_match.group(1)
+            return stripped_header
+        regex_rfc5424 = re.search(
             r"(?:(\d{4}[-]\d{2}[-]\d{2}[T]\d{2}[:]\d{2}[:]\d{2}(?:\.\d{1,6})?(?:[+-]\d{2}[:]\d{2}|Z)?)|-)\s(?:([\w][\w\d\.@-]*)|-)\s(.*)$",
             raw_event)
-        if not result:
-            result = re.search(
-                r"([A-Z][a-z][a-z]\s{1,2}\d{1,2}\s\d{2}[:]\d{2}[:]\d{2})\s+([\w][\w\d\.@-]*)\s(.*)$",
-                raw_event)
-        stripped_header = result.group(3)
-        return stripped_header
+        if regex_rfc5424:
+            stripped_header = regex_rfc5424.group(3)
+            return stripped_header
+        regex_rfc3164 = re.search(
+            r"([A-Z][a-z][a-z]\s{1,2}\d{1,2}\s\d{2}[:]\d{2}[:]\d{2})\s+([\w][\w\d\.@-]*)\s(.*)$",
+            raw_event)
+        if regex_rfc3164:
+            stripped_header = regex_rfc3164.group(3)
+            return stripped_header
 
     def generate_cim_req_params(self):
         """

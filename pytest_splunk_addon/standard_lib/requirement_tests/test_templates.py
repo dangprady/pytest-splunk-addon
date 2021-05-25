@@ -100,7 +100,8 @@ class ReqsTestTemplates(object):
         #     self.logger.info("Issue finding sourcetype")
         #     assert result
         #search = f" search source= pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event} |fields * "
-        search = f"search index=* source=sc4s  {escaped_event} |fields * "
+        #removed source as sc4s assigns source in somecases
+        search = f"search index=* {escaped_event} |fields * "
         ingestion_check = splunk_search_util.checkQueryCountIsGreaterThanZero(
             search, interval=INTERVAL, retries=RETRIES
         )
