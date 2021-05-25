@@ -64,6 +64,18 @@ class ReqsTestGenerator(object):
         for transport in event.iter('transport'):
             return transport.get('type')
 
+    def strip_syslog_header(self, raw_event):
+        raw_event = raw_event.strip()
+        result = re.search(
+            r"(?:(\d{4}[-]\d{2}[-]\d{2}[T]\d{2}[:]\d{2}[:]\d{2}(?:\.\d{1,6})?(?:[+-]\d{2}[:]\d{2}|Z)?)|-)\s(?:([\w][\w\d\.@-]*)|-)\s(.*)$",
+            raw_event)
+        if not result:
+            result = re.search(
+                r"([A-Z][a-z][a-z]\s{1,2}\d{1,2}\s\d{2}[:]\d{2}[:]\d{2})\s+([\w][\w\d\.@-]*)\s(.*)$",
+                raw_event)
+        stripped_header = result.group(3)
+        return stripped_header
+
     def generate_cim_req_params(self):
         """
         Generate & Yield pytest.param for each test case.
@@ -78,46 +90,37 @@ class ReqsTestGenerator(object):
                 filename = os.path.join(req_file_path, file1)
                 LOGGER.info(filename)
                 if filename.endswith(".log"):
-                    try:
-                        model_list = None
-                        list_model_dataset_subdataset = None
-                        key_value_dict = {"None": "None"}
-                        escaped_event = None
-                        sourcetype = None
-                        abc = self.check_xml_format(filename)
-                        root = self.get_root(filename)
-
-                        for event_tag in root.iter('event'):
-                            unescaped_event = self.get_event(event_tag)
-                            transport_type = self.extract_transport_tag(event_tag)
-                            self.logger.info(transport_type)
-                            #sourcetype = self.extractSourcetype(src_regex, unescaped_event)
-                            escaped_event = self.escape_char_event(unescaped_event)
-                            model_list = self.get_models(event_tag)
-                            # Fetching kay value pair from XML
-                            key_value_dict = self.extract_key_value_xml(event_tag)
-                            # self.logger.info(key_value_dict)
-                            if len(model_list) == 0:
-                                continue
-                            list_model_dataset_subdataset = []
-                            for model in model_list:
-                                model = model.replace(" ", "_")
-                                # Function to extract data set
-                                model_name = self.split_model(model)
-                                list_model_dataset_subdataset.append(model_name)
-                                logging.info(model_name)
-                            req_test_id = req_test_id + 1
-                            yield pytest.param(
-                                {
-                                    "model_list": list_model_dataset_subdataset,
-                                    "escaped_event": escaped_event,
-                                    "filename": filename,
-                                    "sourcetype": sourcetype,
-                                    "Key_value_dict": key_value_dict,
-                                },
-                                id=f"{model_list}::{filename}::req_test_id::{req_test_id}",
-                            )
-                    except Exception:
+                    model_list = None
+                    list_model_dataset_subdataset = None
+                    key_value_dict = {"None": "None"}
+                    escaped_event = None
+                    sourcetype = None
+                    abc = self.check_xml_format(filename)
+                    root = self.get_root(filename)
+                    for event_tag in root.iter('event'):
+                        unescaped_event = self.get_event(event_tag)
+                        transport_type = self.extract_transport_tag(event_tag)
+                        self.logger.info(transport_type)
+                        self.logger.info(unescaped_event)
+                        #sourcetype = self.extractSourcetype(src_regex, unescaped_event)
+                        stripped_event = self.strip_syslog_header(unescaped_event)
+                        self.logger.info(stripped_event)
+                        escaped_event = self.escape_char_event(stripped_event)
+                        self.logger.info(escaped_event)
+                        #escaped_event = self.escape_char_event(unescaped_event)
+                        model_list = self.get_models(event_tag)
+                        # Fetching kay value pair from XML
+                        key_value_dict = self.extract_key_value_xml(event_tag)
+                        # self.logger.info(key_value_dict)
+                        if len(model_list) == 0:
+                            continue
+                        list_model_dataset_subdataset = []
+                        for model in model_list:
+                            model = model.replace(" ", "_")
+                            # Function to extract data set
+                            model_name = self.split_model(model)
+                            list_model_dataset_subdataset.append(model_name)
+                            logging.info(model_name)
                         req_test_id = req_test_id + 1
                         yield pytest.param(
                             {
@@ -125,9 +128,21 @@ class ReqsTestGenerator(object):
                                 "escaped_event": escaped_event,
                                 "filename": filename,
                                 "sourcetype": sourcetype,
+                                "Key_value_dict": key_value_dict,
                             },
                             id=f"{model_list}::{filename}::req_test_id::{req_test_id}",
                         )
+
+                        # req_test_id = req_test_id + 1
+                        # yield pytest.param(
+                        #     {
+                        #         "model_list": list_model_dataset_subdataset,
+                        #         "escaped_event": escaped_event,
+                        #         "filename": filename,
+                        #         "sourcetype": sourcetype,
+                        #     },
+                        #     id=f"{model_list}::{filename}::req_test_id::{req_test_id}",
+                        # )
 
 
     def get_models(self, root):
