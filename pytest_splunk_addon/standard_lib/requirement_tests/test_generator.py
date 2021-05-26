@@ -104,17 +104,12 @@ class ReqsTestGenerator(object):
                         for event_tag in root.iter('event'):
                             unescaped_event = self.get_event(event_tag)
                             transport_type = self.extract_transport_tag(event_tag)
-                            self.logger.info(transport_type)
-                            self.logger.info(unescaped_event)
                             if transport_type == "syslog":
                                 stripped_event = self.strip_syslog_header(unescaped_event)
                             else:
-                                # non syslog events are skipped
+                                #todo: non syslog events are skipped currently until we support it
                                 continue
-                            self.logger.info(stripped_event)
                             escaped_event = self.escape_char_event(stripped_event)
-                            self.logger.info(escaped_event)
-                            #escaped_event = self.escape_char_event(unescaped_event)
                             model_list = self.get_models(event_tag)
                             # Fetching kay value pair from XML
                             key_value_dict = self.extract_key_value_xml(event_tag)
