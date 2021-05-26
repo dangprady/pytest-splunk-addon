@@ -65,6 +65,7 @@ class ReqsTestGenerator(object):
             return transport.get('type')
 
     def strip_syslog_header(self, raw_event):
+        # remove leading space chars
         raw_event = raw_event.strip()
         CEF_format_match = re.search(r"\s(CEF:\d\|[^\|]+\|([^\|]+)\|[^\|]+\|[^\|]+\|[^\|]+\|([^\|]+)\|(.*))", raw_event)
         if CEF_format_match:
@@ -82,6 +83,8 @@ class ReqsTestGenerator(object):
         if regex_rfc3164:
             stripped_header = regex_rfc3164.group(3)
             return stripped_header
+        if not (CEF_format_match and regex_rfc3164 and regex_rfc5424):
+            return None
 
     def generate_cim_req_params(self):
         """
@@ -109,12 +112,16 @@ class ReqsTestGenerator(object):
                             else:
                                 #todo: non syslog events are skipped currently until we support it
                                 continue
+                            if stripped_event is None:
+                                LOGGER.error("Syslog event do not match CEF, RFC_3164, RFC_5424 format")
+                                continue
                             escaped_event = self.escape_char_event(stripped_event)
                             model_list = self.get_models(event_tag)
                             # Fetching kay value pair from XML
                             key_value_dict = self.extract_key_value_xml(event_tag)
                             # self.logger.info(key_value_dict)
                             if len(model_list) == 0:
+                                LOGGER.info("No model in this event")
                                 continue
                             list_model_dataset_subdataset = []
                             for model in model_list:
