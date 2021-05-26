@@ -90,17 +90,10 @@ class ReqsTestTemplates(object):
     @pytest.mark.splunk_searchtime_requirements
     def test_requirement_params(self, splunk_searchtime_requirement_param, splunk_search_util):
         model_datalist = splunk_searchtime_requirement_param["model_list"]
-        self.logger.info(model_datalist[0])
         escaped_event = splunk_searchtime_requirement_param["escaped_event"]
-        filename = splunk_searchtime_requirement_param["filename"]
-        sourcetype = splunk_searchtime_requirement_param["sourcetype"]
         key_values_xml = splunk_searchtime_requirement_param["Key_value_dict"]
-        result = False
-        # if sourcetype is None:
-        #     self.logger.info("Issue finding sourcetype")
-        #     assert result
         #search = f" search source= pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event} |fields * "
-        #removed source as sc4s assigns source in somecases
+        #removed source and sourcetype as sc4s assigns it based on event
         search = f"search index=* {escaped_event} |fields * "
         ingestion_check = splunk_search_util.checkQueryCountIsGreaterThanZero(
             search, interval=INTERVAL, retries=RETRIES
