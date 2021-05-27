@@ -79,6 +79,7 @@ class RequirementEventIngestor(object):
                     list_src_regex.append(obj)
         return list_src_regex
 
+    # Will not be used
     def extract_sourcetype(self, list_src_regex, event):
         """
         Using app path extract sourcetype of the events
@@ -126,10 +127,8 @@ class RequirementEventIngestor(object):
                             else:
                                 transport_type = "default"
                             unescaped_event = self.extract_raw_events(event_tag)
-                            sourcetype = self.extract_sourcetype(src_regex, unescaped_event)
                             escaped_ingest = self.escape_before_ingest(unescaped_event)
                             metadata = {'input_type': transport_type,
-                                        'sourcetype': sourcetype,
                                         'index': 'main'
                                         }
                             events.append(SampleEvent(escaped_ingest, metadata, "requirement_test"))

@@ -236,6 +236,7 @@ class ReqsTestGenerator(object):
                     list_src_regex.append(obj)
         return list_src_regex
 
+    # Not used as sending data using SC4S
     def extractSourcetype(self, list_src_regex, event):
         """
         Input: event, List of SrcRegex

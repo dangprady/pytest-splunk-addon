@@ -270,7 +270,7 @@ def test_get_root(et_parse_mock):
     "is_xml_valid, expected_output",
     [
         (True, True),
-        (False, None),
+        (False, False),
     ],
 )
 def test_check_xml_format(et_parse_mock, is_xml_valid, expected_output):
