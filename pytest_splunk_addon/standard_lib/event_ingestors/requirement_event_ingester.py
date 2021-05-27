@@ -104,7 +104,7 @@ class RequirementEventIngestor(object):
             event = event.strip()
         return event
 
-    #extract  transport tag
+    # extract transport tag
     def extract_transport_tag(self, event):
         for transport in event.iter('transport'):
             return transport.get('type')
@@ -115,16 +115,14 @@ class RequirementEventIngestor(object):
         events = []
         if os.path.isdir(req_file_path):
             for file1 in os.listdir(req_file_path):
-                LOGGER.info(file1)
                 filename = os.path.join(req_file_path, file1)
                 if filename.endswith(".log"):
-                    LOGGER.info(filename)
                     if self.check_xml_format(filename):
                         root = self.get_root(filename)
                         for event_tag in root.iter('event'):
                             transport_type = self.extract_transport_tag(event_tag)
                             if transport_type == "syslog":
-                                LOGGER.info("sending data using sc4s")
+                                LOGGER.info("sending data using sc4s {}".format(filename))
                             else:
                                 transport_type = "default"
                             unescaped_event = self.extract_raw_events(event_tag)

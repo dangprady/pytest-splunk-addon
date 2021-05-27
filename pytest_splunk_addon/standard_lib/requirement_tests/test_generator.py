@@ -99,48 +99,46 @@ class ReqsTestGenerator(object):
                 LOGGER.info(filename)
                 if filename.endswith(".log"):
                     try:
-                        try:
-                            self.check_xml_format(filename)
-                        except Exception:
-                            LOGGER.error("Invalid XML")
-                        root = self.get_root(filename)
-                        for event_tag in root.iter('event'):
-                            unescaped_event = self.get_event(event_tag)
-                            transport_type = self.extract_transport_tag(event_tag)
-                            if transport_type == "syslog":
-                                stripped_event = self.strip_syslog_header(unescaped_event)
-                            else:
-                                #todo: non syslog events are skipped currently until we support it
-                                continue
-                            if stripped_event is None:
-                                LOGGER.error("Syslog event do not match CEF, RFC_3164, RFC_5424 format")
-                                continue
-                            escaped_event = self.escape_char_event(stripped_event)
-                            model_list = self.get_models(event_tag)
-                            # Fetching kay value pair from XML
-                            key_value_dict = self.extract_key_value_xml(event_tag)
-                            # self.logger.info(key_value_dict)
-                            if len(model_list) == 0:
-                                LOGGER.info("No model in this event")
-                                continue
-                            list_model_dataset_subdataset = []
-                            for model in model_list:
-                                model = model.replace(" ", "_")
-                                # Function to extract data set
-                                model_name = self.split_model(model)
-                                list_model_dataset_subdataset.append(model_name)
-                                logging.info(model_name)
-                            req_test_id = req_test_id + 1
-                            yield pytest.param(
-                                {
-                                    "model_list": list_model_dataset_subdataset,
-                                    "escaped_event": escaped_event,
-                                    "Key_value_dict": key_value_dict,
-                                },
-                                id=f"{model_list}::{filename}::req_test_id::{req_test_id}",
-                            )
+                        self.check_xml_format(filename)
                     except Exception:
-                        LOGGER.error("Issue with requirement file")
+                        LOGGER.error("Invalid XML")
+                        continue
+                    root = self.get_root(filename)
+                    for event_tag in root.iter('event'):
+                        unescaped_event = self.get_event(event_tag)
+                        transport_type = self.extract_transport_tag(event_tag)
+                        if transport_type == "syslog":
+                            stripped_event = self.strip_syslog_header(unescaped_event)
+                        else:
+                            # todo: non syslog events are skipped currently until we support it
+                            continue
+                        if stripped_event is None:
+                            LOGGER.error("Syslog event do not match CEF, RFC_3164, RFC_5424 format")
+                            continue
+                        escaped_event = self.escape_char_event(stripped_event)
+                        model_list = self.get_models(event_tag)
+                        # Fetching kay value pair from XML
+                        key_value_dict = self.extract_key_value_xml(event_tag)
+                        # self.logger.info(key_value_dict)
+                        if len(model_list) == 0:
+                            LOGGER.info("No model in this event")
+                            continue
+                        list_model_dataset_subdataset = []
+                        for model in model_list:
+                            model = model.replace(" ", "_")
+                            # Function to extract data set
+                            model_name = self.split_model(model)
+                            list_model_dataset_subdataset.append(model_name)
+                            logging.info(model_name)
+                        req_test_id = req_test_id + 1
+                        yield pytest.param(
+                            {
+                                "model_list": list_model_dataset_subdataset,
+                                "escaped_event": escaped_event,
+                                "Key_value_dict": key_value_dict,
+                            },
+                            id=f"{model_list}::{filename}::req_test_id::{req_test_id}",
+                        )
 
     def get_models(self, root):
         """
@@ -196,8 +194,10 @@ class ReqsTestGenerator(object):
         return root
 
     def check_xml_format(self, file_name):
-        if (ET.parse(file_name)):
+        if ET.parse(file_name):
             return True
+        else:
+            return False
 
     def escape_char_event(self, event):
         """
