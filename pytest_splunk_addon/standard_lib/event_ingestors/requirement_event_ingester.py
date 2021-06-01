@@ -4,21 +4,12 @@
 # Function:  Sourcetype the event before ingesting  to Splunk by using
 # transforms.conf regex in config [Metadata: Sourcetype]
 
-import requests
 import logging
 import os
-import configparser, re
 from xml.etree import cElementTree as ET
 from ..sample_generation.sample_event import SampleEvent
 
 LOGGER = logging.getLogger("pytest-splunk-addon")
-
-
-class SrcRegex(object):
-    def __init__(self):
-        self.regex_src = None
-        self.source_type = None
-
 
 class RequirementEventIngestor(object):
 
@@ -56,45 +47,6 @@ class RequirementEventIngestor(object):
             event = raw.text
         return event
 
-    def extract_regex_transforms(self):
-        """
-        Requirement : app transform.conf
-        Return: SrcRegex objects list containing pair of regex and sourcetype
-        """
-        parser = configparser.ConfigParser(interpolation=None)
-        transforms_path = os.path.join(str(self.app_path), "default/transforms.conf")
-        parser.read_file(open(transforms_path))
-        list_src_regex = []
-        for stanza in parser.sections():
-            stanza_keys = list(parser[stanza].keys())
-            obj = SrcRegex()
-            if "dest_key" in stanza_keys:
-                if str(parser[stanza]["dest_key"]) == "MetaData:Sourcetype":
-                    for key in stanza_keys:
-                        key_value = str(parser[stanza][key])
-                        if key == "regex":
-                            obj.regex_src = key_value
-                        if key == "format":
-                            obj.source_type = key_value
-                    list_src_regex.append(obj)
-        return list_src_regex
-
-    # Will not be used
-    def extract_sourcetype(self, list_src_regex, event):
-        """
-        Using app path extract sourcetype of the events
-        From tranforms.conf [Metadata: Sourcetype] Regex
-        This only works for syslog apps with this section
-        Input: event, List of SrcRegex
-        Return:Sourcetype of the event
-        """
-        sourcetype = None
-        for regex_src_obj in list_src_regex:
-            regex_match = re.search(regex_src_obj.regex_src, event)
-            if regex_match:
-                _, sourcetype = str(regex_src_obj.source_type).split('::', 1)
-        return sourcetype
-
     def escape_before_ingest(self, event):
         """
         Function to escape event's with backslash before ingest
@@ -112,7 +64,6 @@ class RequirementEventIngestor(object):
 
     def get_events(self):
         req_file_path = os.path.join(self.app_path, "requirement_files")
-        src_regex = self.extract_regex_transforms()
         events = []
         if os.path.isdir(req_file_path):
             for file1 in os.listdir(req_file_path):
