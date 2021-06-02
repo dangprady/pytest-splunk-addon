@@ -4,11 +4,9 @@ from collections import namedtuple
 from recordtype import recordtype
 from pytest_splunk_addon.standard_lib.requirement_tests.test_generator import (
     ReqsTestGenerator,
-    SrcRegex,
 )
 
 root_content = namedtuple("Element", ["text"])
-src_regex = recordtype("SrcRegex", [("regex_src", None), ("source_type", None)])
 
 
 @pytest.fixture()
@@ -22,6 +20,7 @@ def root_mock():
     root_mock.tags = {
         "model": ["Network Traffic", "Authentication"],
         "raw": ["RT_FLOW_SESSION_CREATE"],
+        "transport_type": ["syslog"],
     }
     root_mock.iter.side_effect = lambda x: (
         root_content(text=item) for item in root_mock.tags[x]
@@ -38,48 +37,6 @@ def et_parse_mock(monkeypatch):
     )
     return tree_mock
 
-
-@pytest.fixture()
-def src_regex_mock(monkeypatch):
-    monkeypatch.setattr(
-        "pytest_splunk_addon.standard_lib.requirement_tests.test_generator.SrcRegex",
-        src_regex,
-    )
-
-
-@pytest.fixture()
-def configparser_mock(monkeypatch):
-    config_mock = MagicMock()
-    config_mock.sections.return_value = [
-        "ta_fiction_lookup",
-        "fiction-rsc-delim-fields",
-        "fiction-tsc-regex",
-    ]
-    items = {
-        "ta_fiction_lookup": {"a": 1, "b": 3},
-        "fiction-rsc-delim-fields": {
-            "dest_key": "MetaData:Sourcetype",
-            "fields": "day_id, event_id, end_time, start_time",
-            "format": 'comp::"$1"',
-        },
-        "fiction-tsc-regex": {
-            "dest_key": "MetaData:Sourcetype",
-            "regex": "group=(?<extractone>[^,]+)",
-        },
-    }
-    config_mock.__getitem__.side_effect = lambda key: items[key]
-    config_mock.return_value = config_mock
-    monkeypatch.setattr(
-        "configparser.ConfigParser",
-        config_mock,
-    )
-    return config_mock
-
-
-def test_src_regex_can_be_instantiated():
-    srcregex = SrcRegex()
-    assert hasattr(srcregex, "regex_src")
-    assert hasattr(srcregex, "source_type")
 
 
 def test_generate_tests():
@@ -121,7 +78,7 @@ def test_extract_key_value_xml():
             ["requirement.log"],
             [True],
             ["syslog"],
-            {"event": ["<34>Oct 11 22:14:15 mymachine event_1", "event_2"]},
+            {"event": ["<34>Oct 11 22:14:15 machine1 event_1", "<34>Oct 11 22:14:15 machine2 event_2"]},
             [["model_1:dataset_1", "model_2:dataset_2"], ["model_3:dataset_3"]],
             [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
             [
@@ -132,14 +89,39 @@ def test_extract_key_value_xml():
                             ("model_2", "dataset_2", ""),
                         ],
                         "escaped_event": "event_1",
-                        "filename": "fake_path/requirement_files/requirement.log",
                         "Key_value_dict": {"field1": "value1", "field2": "value2"},
                     },
                     "['model_1:dataset_1',"
                     " 'model_2:dataset_2']::fake_path/requirement_files/requirement.log"
                     "::req_test_id::1",
                 ),
+                (
+                    {
+                        "model_list": [("model_3", "dataset_3", "")],
+                        "escaped_event": "event_2",
+                        "Key_value_dict": {"field3": "value3"},
+                    },
+                    "['model_3:dataset_3']::fake_path/requirement_files/requirement.log::req_test_id::2",
+                ),
             ],
+        ),
+        (
+            ["requirement.xml"],
+            [True],
+            ["syslog"],
+            {"event": ["event_1", "event_2"]},
+            [["model_1:dataset_1", "model_2:dataset_2"], ["model_3:dataset_3"]],
+            [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
+            [],
+        ),
+        (
+            ["req.log"],
+            [True],
+            ["syslog"],
+            {"event": ["event_1"]},
+            [[]],
+            [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
+            [],
         ),
     ],
 )
@@ -160,12 +142,6 @@ def test_generate_cim_req_params(
     os_listdir_mock.return_value = listdir_return_value
     root_mock.tags.update(root_events)
     with patch.object(
-        ReqsTestGenerator,
-        "extractRegexTransforms",
-        retrun_value=[
-            src_regex(source_type='comp::"$1"', regex_src="group=(?<extractone>[^,]+)")
-        ],
-    ), patch.object(
         ReqsTestGenerator, "check_xml_format", side_effect=check_xml_format_return_value
     ), patch.object(
         ReqsTestGenerator, "extract_transport_tag", side_effect=extract_transport_tag_return_value
@@ -194,6 +170,7 @@ def test_generate_cim_req_params(
         param_mock.assert_has_calls(
             [call(param[0], id=param[1]) for param in expected_output]
         )
+
 
 
 def test_get_models(root_mock):
