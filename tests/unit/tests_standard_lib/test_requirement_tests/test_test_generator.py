@@ -111,8 +111,8 @@ def test_extract_key_value_xml():
 @pytest.mark.parametrize(
     "listdir_return_value, "
     "check_xml_format_return_value, "
+    "extract_transport_tag_return_value, "
     "root_events, "
-    "extractSourcetype_return_value, "
     "get_models_return_value, "
     "extract_key_value_xml_return_value, "
     "expected_output",
@@ -120,8 +120,8 @@ def test_extract_key_value_xml():
         (
             ["requirement.log"],
             [True],
-            {"event": ["event_1", "event_2"]},
-            ["splunkd", "sc4s"],
+            ["syslog"],
+            {"event": ["<34>Oct 11 22:14:15 mymachine event_1", "event_2"]},
             [["model_1:dataset_1", "model_2:dataset_2"], ["model_3:dataset_3"]],
             [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
             [
@@ -133,61 +133,13 @@ def test_extract_key_value_xml():
                         ],
                         "escaped_event": "event_1",
                         "filename": "fake_path/requirement_files/requirement.log",
-                        "sourcetype": "splunkd",
                         "Key_value_dict": {"field1": "value1", "field2": "value2"},
                     },
                     "['model_1:dataset_1',"
                     " 'model_2:dataset_2']::fake_path/requirement_files/requirement.log"
                     "::req_test_id::1",
                 ),
-                (
-                    {
-                        "model_list": [("model_3", "dataset_3", "")],
-                        "escaped_event": "event_2",
-                        "filename": "fake_path/requirement_files/requirement.log",
-                        "sourcetype": "sc4s",
-                        "Key_value_dict": {"field3": "value3"},
-                    },
-                    "['model_3:dataset_3']::fake_path/requirement_files/requirement.log::req_test_id::2",
-                ),
             ],
-        ),
-        (
-            ["requirement.xml"],
-            [True],
-            {"event": ["event_1", "event_2"]},
-            ["splunkd", "sc4s"],
-            [["model_1:dataset_1", "model_2:dataset_2"], ["model_3:dataset_3"]],
-            [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
-            [],
-        ),
-        (
-            ["not_requirement.log"],
-            Exception,
-            {"event": ["event_1", "event_2"]},
-            ["splunkd", "sc4s"],
-            [["model_1:dataset_1", "model_2:dataset_2"], ["model_3:dataset_3"]],
-            [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
-            [
-                (
-                    {
-                        "model_list": None,
-                        "escaped_event": None,
-                        "filename": "fake_path/requirement_files/not_requirement.log",
-                        "sourcetype": None,
-                    },
-                    "None::fake_path/requirement_files/not_requirement.log::req_test_id::1",
-                ),
-            ],
-        ),
-        (
-            ["req.log"],
-            [True],
-            {"event": ["event_1"]},
-            ["splunkd", "sc4s"],
-            [[]],
-            [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
-            [],
         ),
     ],
 )
@@ -196,8 +148,8 @@ def test_generate_cim_req_params(
     root_mock,
     listdir_return_value,
     check_xml_format_return_value,
+    extract_transport_tag_return_value,
     root_events,
-    extractSourcetype_return_value,
     get_models_return_value,
     extract_key_value_xml_return_value,
     expected_output,
@@ -216,13 +168,11 @@ def test_generate_cim_req_params(
     ), patch.object(
         ReqsTestGenerator, "check_xml_format", side_effect=check_xml_format_return_value
     ), patch.object(
+        ReqsTestGenerator, "extract_transport_tag", side_effect=extract_transport_tag_return_value
+    ), patch.object(
         ReqsTestGenerator, "get_root", side_effect=[root_mock]
     ), patch.object(
         ReqsTestGenerator, "get_event", side_effect=lambda x: x.text
-    ), patch.object(
-        ReqsTestGenerator,
-        "extractSourcetype",
-        side_effect=extractSourcetype_return_value,
     ), patch.object(
         ReqsTestGenerator, "escape_char_event", side_effect=lambda x: x
     ), patch.object(
@@ -323,20 +273,3 @@ def test_escape_char_event(escape_char, expected_output):
     rtg = ReqsTestGenerator("fake_path")
     assert rtg.escape_char_event(f"SESSION {escape_char} CREATED") == expected_output
 
-
-def test_extrect_regex_transforms(open_mock, configparser_mock, src_regex_mock):
-    rtg = ReqsTestGenerator("fake_path")
-    out = rtg.extractRegexTransforms()
-    assert out == [
-        src_regex(source_type='comp::"$1"'),
-        src_regex(regex_src="group=(?<extractone>[^,]+)"),
-    ]
-
-
-def test_extract_sourcetype():
-    rtg = ReqsTestGenerator("fake_path")
-    out = rtg.extractSourcetype(
-        [src_regex(source_type='comp::"$1"', regex_src="group=(\\w+),")],
-        "event start group=alert, event end",
-    )
-    assert out == '"$1"'
