@@ -1,7 +1,7 @@
 import pytest
+import traceback
 from unittest.mock import MagicMock, call, patch
 from collections import namedtuple
-from recordtype import recordtype
 from pytest_splunk_addon.standard_lib.requirement_tests.test_generator import (
     ReqsTestGenerator,
 )
@@ -20,7 +20,6 @@ def root_mock():
     root_mock.tags = {
         "model": ["Network Traffic", "Authentication"],
         "raw": ["RT_FLOW_SESSION_CREATE"],
-        "transport_type": ["syslog"],
     }
     root_mock.iter.side_effect = lambda x: (
         root_content(text=item) for item in root_mock.tags[x]
@@ -36,7 +35,6 @@ def et_parse_mock(monkeypatch):
         tree_mock,
     )
     return tree_mock
-
 
 
 def test_generate_tests():
@@ -65,6 +63,21 @@ def test_extract_key_value_xml():
     event.iter.assert_called_once_with("field")
 
 
+def test_extract_transport_tag():
+    event = MagicMock()
+    event.iter.side_effect = lambda x: (
+        d
+        for d in [
+            {"type": "syslog"},
+        ]
+    )
+    rtg = ReqsTestGenerator("fake_path")
+    out = rtg.extract_transport_tag(event)
+    assert out == "syslog"
+    event.iter.assert_called_once_with("transport")
+
+
+
 @pytest.mark.parametrize(
     "listdir_return_value, "
     "check_xml_format_return_value, "
@@ -77,9 +90,9 @@ def test_extract_key_value_xml():
         (
             ["requirement.log"],
             [True],
-            ["syslog"],
-            {"event": ["<34>Oct 11 22:14:15 machine1 event_1", "<34>Oct 11 22:14:15 machine2 event_2"]},
-            [["model_1:dataset_1", "model_2:dataset_2"], ["model_3:dataset_3"]],
+            ['syslog'],
+            {"event": ["<34>Oct 11 22:14:15 machine1 event_1"]},
+            [["model_1:dataset_1", "model_2:dataset_2"]],
             [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
             [
                 (
@@ -94,14 +107,6 @@ def test_extract_key_value_xml():
                     "['model_1:dataset_1',"
                     " 'model_2:dataset_2']::fake_path/requirement_files/requirement.log"
                     "::req_test_id::1",
-                ),
-                (
-                    {
-                        "model_list": [("model_3", "dataset_3", "")],
-                        "escaped_event": "event_2",
-                        "Key_value_dict": {"field3": "value3"},
-                    },
-                    "['model_3:dataset_3']::fake_path/requirement_files/requirement.log::req_test_id::2",
                 ),
             ],
         ),
@@ -170,7 +175,6 @@ def test_generate_cim_req_params(
         param_mock.assert_has_calls(
             [call(param[0], id=param[1]) for param in expected_output]
         )
-
 
 
 def test_get_models(root_mock):

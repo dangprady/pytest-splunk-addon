@@ -4,7 +4,6 @@ Generates test cases to verify the event analytics logs.
 import pytest
 import logging
 import os
-import configparser
 from xml.etree import cElementTree as ET
 import re
 
@@ -62,7 +61,7 @@ class ReqsTestGenerator(object):
 
     def extract_transport_tag(self, event):
         for transport in event.iter('transport'):
-            return transport.get('type')
+            return str(transport.get('type'))
 
     def strip_syslog_header(self, raw_event):
         # remove leading space chars
@@ -211,40 +210,3 @@ class ReqsTestGenerator(object):
         for character in escape_splunk_chars:
             event = event.replace(character, '\\' + character)
         return event
-
-    #Not used as sending data using SC4S
-    def extractRegexTransforms(self):
-        """
-        Requirement : app transform.conf
-        Return: SrcRegex objects list containing pair of regex and sourcetype
-        """
-        parser = configparser.ConfigParser(interpolation=None)
-        transforms_path = os.path.join(str(self.package_path), "default/transforms.conf")
-        parser.read_file(open(transforms_path))
-        list_src_regex = []
-        for stanza in parser.sections():
-            stanza_keys = list(parser[stanza].keys())
-            obj = SrcRegex()
-            if "dest_key" in stanza_keys:
-                if str(parser[stanza]["dest_key"]) == "MetaData:Sourcetype":
-                    for key in stanza_keys:
-                        key_value = str(parser[stanza][key])
-                        if key == "regex":
-                            obj.regex_src = key_value
-                        if key == "format":
-                            obj.source_type = key_value
-                    list_src_regex.append(obj)
-        return list_src_regex
-
-    # Not used as sending data using SC4S
-    def extractSourcetype(self, list_src_regex, event):
-        """
-        Input: event, List of SrcRegex
-        Return:Sourcetype of the event
-        """
-        sourcetype = None
-        for regex_src_obj in list_src_regex:
-            regex_match = re.search(regex_src_obj.regex_src, event)
-            if regex_match:
-                _, sourcetype = str(regex_src_obj.source_type).split('::', 1)
-        return sourcetype
