@@ -13,11 +13,11 @@ LOGGER = logging.getLogger("pytest-splunk-addon")
 
 class RequirementEventIngestor(object):
 
-    def __init__(self, app_path):
+    def __init__(self, requirement_file_path):
         """
         app_path to drill down to requirement file folder in package/tests/requirement_files/
         """
-        self.app_path = app_path
+        self.requirement_file_path = requirement_file_path
         pass
 
     def check_xml_format(self, file_name):
@@ -63,7 +63,7 @@ class RequirementEventIngestor(object):
             return transport.get('type')
 
     def get_events(self):
-        req_file_path = os.path.join(self.app_path, "requirement_files")
+        req_file_path = self.requirement_file_path
         events = []
         if os.path.isdir(req_file_path):
             for file1 in os.listdir(req_file_path):
@@ -83,4 +83,10 @@ class RequirementEventIngestor(object):
                                         'index': 'main'
                                         }
                             events.append(SampleEvent(escaped_ingest, metadata, "requirement_test"))
-            return events
+                    else:
+                        LOGGER.error("Requirement event ingestion failure: Invalid XML")
+                else:
+                    LOGGER.error("Requirement event ingestion failure no .log file in requirement_files/")
+        else:
+            LOGGER.error("Requirement event ingestion failure: Invalid requirement file path")
+        return events

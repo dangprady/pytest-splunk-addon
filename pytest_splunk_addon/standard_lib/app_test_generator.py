@@ -53,7 +53,7 @@ class AppTestGenerator(object):
             "Initializing ReqsTestGenerator to generate the test cases"
         )
         self.requirement_test_generator = ReqsTestGenerator(
-            self.pytest_config.getoption("splunk_app"),
+            self.pytest_config.getoption("requirement_test"),
         )
         self.indextime_test_generator = IndexTimeTestGenerator()
 

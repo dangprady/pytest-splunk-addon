@@ -34,10 +34,9 @@ class ReqsTestGenerator(object):
     """
     logger = logging.getLogger()
 
-    def __init__(self, app_path):
+    def __init__(self, requirement_files_path):
         logging.info("initializing ReqsTestGenerator class")
-        self.package_path = app_path
-        self.folder_path = os.path.join(str(self.package_path), "requirement_files")
+        self.folder_path = requirement_files_path
 
     def generate_tests(self, fixture):
         """
