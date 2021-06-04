@@ -105,7 +105,7 @@ def test_extract_transport_tag():
                         "Key_value_dict": {"field1": "value1", "field2": "value2"},
                     },
                     "['model_1:dataset_1',"
-                    " 'model_2:dataset_2']::fake_path/requirement_files/requirement.log"
+                    " 'model_2:dataset_2']::fake_path/requirement.log"
                     "::req_test_id::1",
                 ),
             ],
