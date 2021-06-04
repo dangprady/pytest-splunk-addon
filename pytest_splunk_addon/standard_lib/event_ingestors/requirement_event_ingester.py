@@ -84,9 +84,9 @@ class RequirementEventIngestor(object):
                                         }
                             events.append(SampleEvent(escaped_ingest, metadata, "requirement_test"))
                     else:
-                        LOGGER.error("Requirement event ingestion failure: Invalid XML")
+                        LOGGER.error("Requirement event ingestion failure: Invalid XML {}".format(filename))
                 else:
-                    LOGGER.error("Requirement event ingestion failure no .log file in requirement_files/")
+                    LOGGER.error("Requirement event ingestion failure: Invalid file format not .log {}".format(filename))
         else:
-            LOGGER.error("Requirement event ingestion failure: Invalid requirement file path")
+            LOGGER.error("Requirement event ingestion failure: Invalid requirement file path {}".format(req_file_path))
         return events
