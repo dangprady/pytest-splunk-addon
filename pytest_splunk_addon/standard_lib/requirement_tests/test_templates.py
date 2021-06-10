@@ -81,8 +81,11 @@ class ReqsTestTemplates(object):
     # Function which runs data model check
     def datamodel_check_test(self, keyValue_dict_SPL, requrement_file_model_list):
         extracted_tags = self.extract_tag(keyValue_dict_SPL)
-        datamodel_based_on_tag = self.fetch_datamodel_by_tags(extracted_tags)
-        datamodel_based_on_tag = self.remove_subset_datamodel(datamodel_based_on_tag)
+        if extracted_tags == None:
+            datamodel_based_on_tag = {}
+        else:
+            datamodel_based_on_tag = self.fetch_datamodel_by_tags(extracted_tags)
+            datamodel_based_on_tag = self.remove_subset_datamodel(datamodel_based_on_tag)
         lis_extra_extracted_splunkside, list_extra_datamodel_requirement_file = self.compare_datamodel(
             requrement_file_model_list, datamodel_based_on_tag)
         return list_extra_datamodel_requirement_file, lis_extra_extracted_splunkside

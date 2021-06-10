@@ -37,8 +37,8 @@ def setup_test_dir(testdir):
     )
 
     shutil.copytree(
-        os.path.join(testdir.request.config.invocation_dir, "tests/requirement_files"),
-        os.path.join(testdir.tmpdir, "tests/requirement_files"),
+        os.path.join(testdir.request.config.invocation_dir, "tests/requirement_test"),
+        os.path.join(testdir.tmpdir, "tests/requirement_test"),
     )
 
     shutil.copy(
@@ -92,7 +92,7 @@ def test_splunk_connection_external(testdir):
     assert result.ret == 0
 
 
-@pytest.mark.docker
+#@pytest.mark.docker
 def test_splunk_connection_docker(testdir):
     """Make sure that pytest accepts our fixture."""
 
@@ -122,7 +122,7 @@ def test_splunk_connection_docker(testdir):
     assert result.ret == 0
 
 
-@pytest.mark.docker
+#@pytest.mark.docker
 def test_splunk_app_fiction(testdir):
     """Make sure that pytest accepts our fixture."""
 
@@ -162,7 +162,7 @@ def test_splunk_app_fiction(testdir):
     assert result.ret == 0
 
 
-@pytest.mark.docker
+#@pytest.mark.docker
 def test_splunk_app_broken(testdir):
     """Make sure that pytest accepts our fixture."""
 
@@ -206,7 +206,7 @@ def test_splunk_app_broken(testdir):
     # The test suite should fail as this is a negative test
     assert result.ret != 0
 
-@pytest.mark.docker
+#@pytest.mark.docker
 def test_splunk_app_cim_fiction(testdir):
     """Make sure that pytest accepts our fixture."""
 
@@ -251,7 +251,7 @@ def test_splunk_app_cim_fiction(testdir):
     # make sure that that we get a '0' exit code for the testsuite
     assert result.ret == 0
 
-@pytest.mark.docker
+#@pytest.mark.docker
 def test_splunk_app_cim_broken(testdir):
     """Make sure that pytest accepts our fixture."""
 
@@ -302,7 +302,7 @@ def test_splunk_app_cim_broken(testdir):
     # The test suite should fail as this is a negative test
     assert result.ret != 0
 
-@pytest.mark.docker
+#@pytest.mark.docker
 def test_splunk_fiction_indextime(testdir):
     """Make sure that pytest accepts our fixture."""
 
@@ -347,7 +347,7 @@ def test_splunk_fiction_indextime(testdir):
     # make sure that that we get a '0' exit code for the testsuite
     assert result.ret == 0
 
-@pytest.mark.docker
+#@pytest.mark.docker
 def test_splunk_fiction_indextime_broken(testdir):
     """Make sure that pytest accepts our fixture."""
 
@@ -394,7 +394,7 @@ def test_splunk_fiction_indextime_broken(testdir):
     # The test suite should fail as this is a negative test
     assert result.ret != 0
 
-@pytest.mark.docker
+#@pytest.mark.docker
 def test_splunk_setup_fixture(testdir):
     testdir.makepyfile(
         """
@@ -434,7 +434,7 @@ def test_splunk_setup_fixture(testdir):
         passed=2
     )
 
-@pytest.mark.doc
+#@pytest.mark.doc
 def test_help_message(testdir):
     result = testdir.runpytest("--help",)
     # fnmatch_lines does an assertion internally
@@ -498,7 +498,7 @@ def test_splunk_app_requirements(testdir):
         "--search-interval=4",
         "--search-retry=4",
         "--search-index=*,_internal",
-        "--requirement-test=tests/requirement_files",
+        "--requirement-test=tests/requirement_test",
     )
     logger.info(result.outlines)
     logger.info(len(constants.TA_REQUIREMENTS_PASSED))
