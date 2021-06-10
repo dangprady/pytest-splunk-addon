@@ -51,10 +51,10 @@ class RequirementEventIngestor(object):
         """
         Function to escape event's with backslash before ingest
         """
-        escape_splunk_chars = ["\""]
-        for character in escape_splunk_chars:
-            event = event.replace(character, '\\' + character)
-            event = event.strip()
+        # escape_splunk_chars = ["\""]
+        # for character in escape_splunk_chars:
+        #     event = event.replace(character, '\\' + character)
+        event = event.strip()
         return event
 
     # extract transport tag
