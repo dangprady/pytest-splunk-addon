@@ -62,6 +62,17 @@ class RequirementEventIngestor(object):
         for transport in event.iter('transport'):
             return transport.get('type')
 
+    # to get models tag in an event
+    def get_models(self, root):
+        """
+        Input: Root of the xml file
+        Function to return list of models in each event of the log file
+        """
+        model_list = []
+        for model in root.iter('model'):
+            model_list.append(str(model.text))
+        return model_list
+
     def get_events(self):
         req_file_path = self.requirement_file_path
         events = []
@@ -72,17 +83,22 @@ class RequirementEventIngestor(object):
                     if self.check_xml_format(filename):
                         root = self.get_root(filename)
                         for event_tag in root.iter('event'):
-                            transport_type = self.extract_transport_tag(event_tag)
-                            if transport_type == "syslog":
-                                LOGGER.info("sending data using sc4s {}".format(filename))
+                            model_list = self.get_models(event_tag)
+                            if len(model_list) != 0:
+                                transport_type = self.extract_transport_tag(event_tag)
+                                if transport_type == "syslog":
+                                    LOGGER.info("sending data using sc4s {}".format(filename))
+                                else:
+                                    transport_type = "default"
+                                unescaped_event = self.extract_raw_events(event_tag)
+                                escaped_ingest = self.escape_before_ingest(unescaped_event)
+                                metadata = {'input_type': transport_type,
+                                            'index': 'main'
+                                            }
+                                events.append(SampleEvent(escaped_ingest, metadata, "requirement_test"))
                             else:
-                                transport_type = "default"
-                            unescaped_event = self.extract_raw_events(event_tag)
-                            escaped_ingest = self.escape_before_ingest(unescaped_event)
-                            metadata = {'input_type': transport_type,
-                                        'index': 'main'
-                                        }
-                            events.append(SampleEvent(escaped_ingest, metadata, "requirement_test"))
+                                # if there is no model in event do not ingest that event
+                                continue
                     else:
                         LOGGER.error("Requirement event ingestion failure: Invalid XML {}".format(filename))
                 else:
