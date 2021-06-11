@@ -76,6 +76,9 @@ def requirement_ingestor_mocked(monkeypatch, mock_object):
         f"{module}.RequirementEventIngestor.check_xml_format", return_value=True
     )
     mock_object(
+        f"{module}.RequirementEventIngestor.get_models", return_value="Network_Traffic"
+    )
+    mock_object(
         f"{module}.RequirementEventIngestor.extract_transport_tag", return_value="syslog"
     )
     root_mock = mock_object(f"{module}.RequirementEventIngestor.get_root")
