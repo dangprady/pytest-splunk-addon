@@ -106,7 +106,7 @@ def test_extract_transport_tag():
                     },
                     "['model_1:dataset_1',"
                     " 'model_2:dataset_2']::fake_path/requirement.log"
-                    "::req_test_id::1",
+                    "::event_no::1::req_test_id::1",
                 ),
             ],
         ),

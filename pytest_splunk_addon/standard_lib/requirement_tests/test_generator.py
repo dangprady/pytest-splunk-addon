@@ -102,7 +102,9 @@ class ReqsTestGenerator(object):
                         LOGGER.error("Invalid XML")
                         continue
                     root = self.get_root(filename)
+                    event_no = 0
                     for event_tag in root.iter('event'):
+                        event_no += 1
                         unescaped_event = self.get_event(event_tag)
                         transport_type = self.extract_transport_tag(event_tag)
                         if transport_type == "syslog":
@@ -135,7 +137,7 @@ class ReqsTestGenerator(object):
                                 "escaped_event": escaped_event,
                                 "Key_value_dict": key_value_dict,
                             },
-                            id=f"{model_list}::{filename}::req_test_id::{req_test_id}",
+                            id=f"{model_list}::{filename}::event_no::{event_no}::req_test_id::{req_test_id}",
                         )
 
     def get_models(self, root):
