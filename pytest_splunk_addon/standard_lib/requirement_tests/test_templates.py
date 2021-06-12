@@ -26,14 +26,15 @@ class ReqsTestTemplates(object):
 
     # Function to compare the fields extracted from XML and the fields extracted from Splunk search
     def compare(self, keyValueSPL, keyValueXML):
+        dict_missing_key_value = {}
         keyValueprocessedSPL = self.process_str(keyValueSPL)
         flag = True
         for key, value in keyValueXML.items():
             res = key in keyValueprocessedSPL and value == keyValueprocessedSPL[key]
             if not res:
-                self.logger.info(key + "="+ value + " pair in requirement file not in SPL extracted fields values")
+                dict_missing_key_value.update({key: value})
                 flag = False
-        return flag
+        return flag, dict_missing_key_value
 
     # Function to extract tags from Splunk search result returned.
     def extract_tag(self, keyValueSPL):
@@ -120,9 +121,11 @@ class ReqsTestTemplates(object):
             f"datamodel in requirement file but not extracted on splunk side or missing dataset {list_unmatched_datamodel_splunkside}\n"
             f"datamodel extracted on splunk side but not in requirement file {list_unmatched_datamodel_requirement_file}\n"
         )
-        field_extraction_check = self.compare(keyValue_dict_SPL, key_values_xml)
+        field_extraction_check, missing_key_value = self.compare(keyValue_dict_SPL, key_values_xml)
         self.logger.info(f"Field mapping check: {field_extraction_check}")
-
+        if missing_key_value:
+            for key, value in missing_key_value.items():
+                self.logger.error(f"Missing key: {key} value: {value}")
         assert field_extraction_check, (
             f"Issue with the field extraction.\nsearch={search}\n"
             f" Field_extraction_check: {field_extraction_check} \n"
