@@ -116,10 +116,12 @@ class ReqsTestTemplates(object):
             list_unmatched_datamodel_requirement_file = "None"
         if not list_unmatched_datamodel_splunkside:
             list_unmatched_datamodel_splunkside = "None"
+        sourcetype = keyValue_dict_SPL["_sourcetype"]
         assert datamodel_check, (
             f"datamodel check: {datamodel_check} \n"
             f"datamodel in requirement file but not extracted on splunk side or missing dataset {list_unmatched_datamodel_splunkside}\n"
             f"datamodel extracted on splunk side but not in requirement file {list_unmatched_datamodel_requirement_file}\n"
+            f"sourcetype: {sourcetype} \n"
         )
         field_extraction_check, missing_key_value = self.compare(keyValue_dict_SPL, key_values_xml)
         self.logger.info(f"Field mapping check: {field_extraction_check}")
@@ -127,4 +129,5 @@ class ReqsTestTemplates(object):
             f"Issue with the field extraction.\nsearch={search}\n"
             f" Field_extraction_check: {field_extraction_check} \n"
             f" Missing key value pairs: {missing_key_value} \n"
+            f"sourcetype: {sourcetype} \n"
         )
