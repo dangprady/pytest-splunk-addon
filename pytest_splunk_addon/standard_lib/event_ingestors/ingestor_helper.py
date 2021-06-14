@@ -45,7 +45,7 @@ class IngestorHelper(object):
             bulk_event_ingestion(bool): Boolean param for bulk event ingestion.
             run_requirement_test(bool) :Boolean to identify if we want to run the requirement tests
         """
-        sample_generator = SampleXdistGenerator(addon_path, config_path, run_requirement_test)
+        sample_generator = SampleXdistGenerator(addon_path, config_path)
         store_sample = sample_generator.get_samples(store_events)
         tokenized_events = store_sample.get("tokenized_events")
         ingestor_dict = dict()
