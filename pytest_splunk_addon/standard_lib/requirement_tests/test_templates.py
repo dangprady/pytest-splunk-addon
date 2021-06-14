@@ -123,10 +123,8 @@ class ReqsTestTemplates(object):
         )
         field_extraction_check, missing_key_value = self.compare(keyValue_dict_SPL, key_values_xml)
         self.logger.info(f"Field mapping check: {field_extraction_check}")
-        if missing_key_value:
-            for key, value in missing_key_value.items():
-                self.logger.error(f"Missing key: {key} value: {value}")
         assert field_extraction_check, (
             f"Issue with the field extraction.\nsearch={search}\n"
             f" Field_extraction_check: {field_extraction_check} \n"
+            f" Missing key value pairs: {missing_key_value} \n"
         )
