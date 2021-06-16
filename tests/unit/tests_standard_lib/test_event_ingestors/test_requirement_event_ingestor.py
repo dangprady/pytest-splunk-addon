@@ -79,7 +79,8 @@ def requirement_ingestor_mocked(monkeypatch, mock_object):
         f"{module}.RequirementEventIngestor.get_models", return_value="Network_Traffic"
     )
     mock_object(
-        f"{module}.RequirementEventIngestor.extract_transport_tag", return_value="syslog"
+        f"{module}.RequirementEventIngestor.extract_transport_tag",
+        return_value="syslog",
     )
     root_mock = mock_object(f"{module}.RequirementEventIngestor.get_root")
     root_mock.return_value = root_mock
@@ -89,7 +90,6 @@ def requirement_ingestor_mocked(monkeypatch, mock_object):
         side_effect=lambda x: f"event: {x}",
     )
     return {"root_mock": root_mock, "ere_mock": ere_mock}
-
 
 
 def test_check_xml_format():
@@ -118,7 +118,7 @@ def test_events_can_be_obtained(
     assert req.get_events() == [
         sample_event(
             event="event: session created",
-            metadata={"input_type": "syslog",  "index": "main"},
+            metadata={"input_type": "syslog", "index": "main"},
             sample_name="requirement_test",
         ),
         sample_event(

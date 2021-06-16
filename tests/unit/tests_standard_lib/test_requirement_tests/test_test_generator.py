@@ -77,7 +77,6 @@ def test_extract_transport_tag():
     event.iter.assert_called_once_with("transport")
 
 
-
 @pytest.mark.parametrize(
     "listdir_return_value, "
     "check_xml_format_return_value, "
@@ -90,7 +89,7 @@ def test_extract_transport_tag():
         (
             ["requirement.log"],
             [True],
-            ['syslog'],
+            ["syslog"],
             {"event": ["<34>Oct 11 22:14:15 machine1 event_1"]},
             [["model_1:dataset_1", "model_2:dataset_2"]],
             [{"field1": "value1", "field2": "value2"}, {"field3": "value3"}],
@@ -149,7 +148,9 @@ def test_generate_cim_req_params(
     with patch.object(
         ReqsTestGenerator, "check_xml_format", side_effect=check_xml_format_return_value
     ), patch.object(
-        ReqsTestGenerator, "extract_transport_tag", side_effect=extract_transport_tag_return_value
+        ReqsTestGenerator,
+        "extract_transport_tag",
+        side_effect=extract_transport_tag_return_value,
     ), patch.object(
         ReqsTestGenerator, "get_root", side_effect=[root_mock]
     ), patch.object(
@@ -253,4 +254,3 @@ def test_check_xml_format(et_parse_mock, is_xml_valid, expected_output):
 def test_escape_char_event(escape_char, expected_output):
     rtg = ReqsTestGenerator("fake_path")
     assert rtg.escape_char_event(f"SESSION {escape_char} CREATED") == expected_output
-

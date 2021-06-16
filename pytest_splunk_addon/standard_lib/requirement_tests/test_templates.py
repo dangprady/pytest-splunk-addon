@@ -1,6 +1,7 @@
 import logging
 import pytest
 from .requirement_test_datamodel_tag_constants import dict_datamodel_tag
+
 INTERVAL = 3
 RETRIES = 3
 
@@ -77,7 +78,9 @@ class ReqsTestTemplates(object):
                 continue
             else:
                 list_extra_datamodel_requirement_file.append(item)
-        return set(lis_extra_extracted_splunkside), set(list_extra_datamodel_requirement_file)
+        return set(lis_extra_extracted_splunkside), set(
+            list_extra_datamodel_requirement_file
+        )
 
     # Function which runs data model check
     def datamodel_check_test(self, keyValue_dict_SPL, requrement_file_model_list):
@@ -86,18 +89,24 @@ class ReqsTestTemplates(object):
             datamodel_based_on_tag = {}
         else:
             datamodel_based_on_tag = self.fetch_datamodel_by_tags(extracted_tags)
-            datamodel_based_on_tag = self.remove_subset_datamodel(datamodel_based_on_tag)
-        lis_extra_extracted_splunkside, list_extra_datamodel_requirement_file = self.compare_datamodel(
-            requrement_file_model_list, datamodel_based_on_tag)
+            datamodel_based_on_tag = self.remove_subset_datamodel(
+                datamodel_based_on_tag
+            )
+        (
+            lis_extra_extracted_splunkside,
+            list_extra_datamodel_requirement_file,
+        ) = self.compare_datamodel(requrement_file_model_list, datamodel_based_on_tag)
         return list_extra_datamodel_requirement_file, lis_extra_extracted_splunkside
 
     @pytest.mark.splunk_searchtime_requirements
-    def test_requirement_params(self, splunk_searchtime_requirement_param, splunk_search_util):
+    def test_requirement_params(
+        self, splunk_searchtime_requirement_param, splunk_search_util
+    ):
         model_datalist = splunk_searchtime_requirement_param["model_list"]
         escaped_event = splunk_searchtime_requirement_param["escaped_event"]
         key_values_xml = splunk_searchtime_requirement_param["Key_value_dict"]
-        #search = f" search source= pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event} |fields * "
-        #removed source and sourcetype as sc4s assigns it based on event
+        # search = f" search source= pytest_splunk_addon:hec:raw sourcetype={sourcetype} {escaped_event} |fields * "
+        # removed source and sourcetype as sc4s assigns it based on event
         search = f"search index=* {escaped_event} |fields * "
         ingestion_check = splunk_search_util.checkQueryCountIsGreaterThanZero(
             search, interval=INTERVAL, retries=RETRIES
@@ -109,8 +118,14 @@ class ReqsTestTemplates(object):
         keyValue_dict_SPL = splunk_search_util.getFieldValuesDict(
             search, interval=INTERVAL, retries=RETRIES
         )
-        list_unmatched_datamodel_splunkside, list_unmatched_datamodel_requirement_file = self.datamodel_check_test(keyValue_dict_SPL, model_datalist)
-        datamodel_check = not bool(list_unmatched_datamodel_splunkside or list_unmatched_datamodel_requirement_file )
+        (
+            list_unmatched_datamodel_splunkside,
+            list_unmatched_datamodel_requirement_file,
+        ) = self.datamodel_check_test(keyValue_dict_SPL, model_datalist)
+        datamodel_check = not bool(
+            list_unmatched_datamodel_splunkside
+            or list_unmatched_datamodel_requirement_file
+        )
         self.logger.info(f"Data model check: {datamodel_check}")
         if not list_unmatched_datamodel_requirement_file:
             list_unmatched_datamodel_requirement_file = "None"
@@ -118,14 +133,16 @@ class ReqsTestTemplates(object):
             list_unmatched_datamodel_splunkside = "None"
         sourcetype = keyValue_dict_SPL["_sourcetype"]
         assert datamodel_check, (
-            f"datamodel check: {datamodel_check} \n"
-            f"datamodel in requirement file but not extracted on splunk side or missing dataset {list_unmatched_datamodel_splunkside}\n"
-            f"datamodel extracted on splunk side but not in requirement file {list_unmatched_datamodel_requirement_file}\n"
-            f"sourcetype: {sourcetype} \n"
+            f"data model check: {datamodel_check} \n"
+            f"data model in requirement file not in Splunk ingested event/ missing dataset {list_unmatched_datamodel_splunkside}\n "
+            f"data model extracted on Splunk side not in requirement file {list_unmatched_datamodel_requirement_file}\n"
+            f"source type of ingested event: {sourcetype} \n"
         )
-        field_extraction_check, missing_key_value = self.compare(keyValue_dict_SPL, key_values_xml)
+        field_extraction_check, missing_key_value = self.compare(
+            keyValue_dict_SPL, key_values_xml
+        )
         self.logger.info(f"Field mapping check: {field_extraction_check}")
-        mismapped_key_value_pair ={}
+        mismapped_key_value_pair = {}
         for key, value in missing_key_value.items():
             if key in keyValue_dict_SPL.keys():
                 valueInSplunk = keyValue_dict_SPL[key]
@@ -134,7 +151,7 @@ class ReqsTestTemplates(object):
         assert field_extraction_check, (
             f"Issue with the field extraction.\nsearch={search}\n"
             f" Field_extraction_check: {field_extraction_check} \n"
-            f" Missing key value : {missing_key_value} \n"
-            f" Mismapped key value in splunk: {mismapped_key_value_pair}\n"
-            f"sourcetype: {sourcetype} \n"
+            f" Key value not extracted in splunk event: {missing_key_value} \n"
+            f" Mismatched key value: {mismapped_key_value_pair}\n"
+            f" source type of ingested event: {sourcetype} \n"
         )
