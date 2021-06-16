@@ -125,9 +125,16 @@ class ReqsTestTemplates(object):
         )
         field_extraction_check, missing_key_value = self.compare(keyValue_dict_SPL, key_values_xml)
         self.logger.info(f"Field mapping check: {field_extraction_check}")
+        mismapped_key_value_pair ={}
+        for key, value in missing_key_value.items():
+            if key in keyValue_dict_SPL.keys():
+                valueInSplunk = keyValue_dict_SPL[key]
+                mismapped_key_value_pair.update({key: valueInSplunk})
+
         assert field_extraction_check, (
             f"Issue with the field extraction.\nsearch={search}\n"
             f" Field_extraction_check: {field_extraction_check} \n"
-            f" Missing key value pairs: {missing_key_value} \n"
+            f" Missing key value : {missing_key_value} \n"
+            f" Mismapped key value in splunk: {mismapped_key_value_pair}\n"
             f"sourcetype: {sourcetype} \n"
         )
